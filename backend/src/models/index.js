@@ -19,7 +19,7 @@ db.Sequelize = Sequelize;
 
 // Загружаем модели
 db.Product = require('./Product')(sequelize, DataTypes);
-// db.User = require('./User')(sequelize, DataTypes); // Если будут другие модели
+db.User = require('./User')(sequelize, DataTypes);
 // db.Order = require('./Order')(sequelize, DataTypes);
 
 // Здесь можно определить ассоциации между моделями, например:
