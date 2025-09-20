@@ -1,11 +1,14 @@
 import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Layout from './components/Layout';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   return (
     <Router>
-      <Layout />
+      <CartProvider>
+        <Layout />
+      </CartProvider>
     </Router>
   );
 }

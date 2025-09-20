@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../logo.png';
 import styles from '../styles/Header.module.css';
+import { CartContext } from '../context/CartContext';
 
 const Header = ({ user, onLogout }) => {
+    const { cartCount } = useContext(CartContext);
+
     return (
         <header className={styles.header}>
             <div className={styles.logoContainer}>
@@ -15,6 +18,9 @@ const Header = ({ user, onLogout }) => {
                 </Link>
             </div>
             <div className={styles.navContainer}>
+                <Link to="/cart" className={styles.navLink}>
+                    Корзина ({cartCount})
+                </Link>
                 {user ? (<span>Привет, {user.username}! <button onClick={onLogout} className={styles.logoutButton}>Выйти</button></span>) : (<Link to="/login" className={styles.navLink}>Войти</Link>)}
                 {user && user.role === 'admin' && (<Link to="/admin" className={styles.navLink}>Админ-панель</Link>)}
             </div>
