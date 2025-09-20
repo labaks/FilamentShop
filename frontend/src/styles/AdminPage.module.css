@@ -10,6 +10,26 @@
     margin-bottom: 2rem;
 }
 
+.nav {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1rem;
+}
+
+.link {
+    margin-right: 1.5rem;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+}
+
+.activeLink {
+    composes: link;
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
+}
+
 .form {
     margin-bottom: 2rem;
     border: 1px solid #ccc;

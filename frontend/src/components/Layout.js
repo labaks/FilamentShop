@@ -11,6 +11,9 @@ import ProtectedRoute from './ProtectedRoute';
 import CartPage from '../pages/CartPage';
 import MyOrdersPage from '../pages/MyOrdersPage';
 import CheckoutPage from '../pages/CheckoutPage';
+import AdminOrderDetailPage from '../pages/AdminOrderDetailPage';
+import AdminProducts from '../pages/AdminProducts';
+import AdminOrders from '../pages/AdminOrders';
 import Header from './Header';
 
 const Layout = () => {
@@ -53,9 +56,13 @@ const Layout = () => {
           <Route path="/login" element={<LoginPage onLogin={() => setUser(jwtDecode(localStorage.getItem('token')))} />} />
           <Route
             path="/admin"
-            element={
-              <ProtectedRoute><AdminPage /></ProtectedRoute>
-            } />
+            element={<ProtectedRoute><AdminPage /></ProtectedRoute>}
+          >
+            <Route index element={<AdminProducts />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+          </Route>
+          <Route path="/admin/orders/:id" element={<ProtectedRoute><AdminOrderDetailPage /></ProtectedRoute>} />
         </Routes>
       </main>
     </div>

@@ -119,3 +119,28 @@ exports.updateOrderStatus = async (req, res) => {
         res.status(500).json({ message: 'Ошибка сервера при обновлении статуса.' });
     }
 };
+
+// Получение одного заказа по ID (для администратора)
+exports.getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findByPk(id, {
+            include: [
+                { model: db.User, attributes: ['id', 'username'] },
+                {
+                    model: OrderItem,
+                    include: [{ model: Product, attributes: ['id', 'name'] }]
+                }
+            ]
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Заказ не найден.' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        console.error(`Ошибка при получении заказа с ID ${req.params.id}:`, error);
+        res.status(500).json({ message: 'Ошибка сервера при получении заказа.' });
+    }
+};

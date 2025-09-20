@@ -16,4 +16,7 @@ router.get('/my', authMiddleware, orderController.getMyOrders);
 // Обновление статуса заказа (только для админов)
 router.put('/:id/status', adminOnlyMiddleware, orderController.updateOrderStatus);
 
+// Получение одного заказа по ID (только для админов)
+router.get('/:id', adminOnlyMiddleware, orderController.getOrderById);
+
 module.exports = router;
