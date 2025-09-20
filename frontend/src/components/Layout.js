@@ -9,6 +9,8 @@ import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ProtectedRoute from './ProtectedRoute';
 import CartPage from '../pages/CartPage';
+import MyOrdersPage from '../pages/MyOrdersPage';
+import CheckoutPage from '../pages/CheckoutPage';
 import Header from './Header';
 
 const Layout = () => {
@@ -45,7 +47,9 @@ const Layout = () => {
           <Route path="/" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage onLogin={() => setUser(jwtDecode(localStorage.getItem('token')))} />} />
           <Route
             path="/admin"

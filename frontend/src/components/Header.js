@@ -21,6 +21,9 @@ const Header = ({ user, onLogout }) => {
                 <Link to="/cart" className={styles.navLink}>
                     Корзина ({cartCount})
                 </Link>
+                {user && (
+                    <Link to="/my-orders" className={styles.navLink}>Мои заказы</Link>
+                )}
                 {user ? (<span>Привет, {user.username}! <button onClick={onLogout} className={styles.logoutButton}>Выйти</button></span>) : (<Link to="/login" className={styles.navLink}>Войти</Link>)}
                 {user && user.role === 'admin' && (<Link to="/admin" className={styles.navLink}>Админ-панель</Link>)}
             </div>

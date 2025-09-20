@@ -46,9 +46,9 @@ const CartPage = () => {
                 <button onClick={clearCart} style={{ marginRight: '1rem' }}>
                     Очистить корзину
                 </button>
-                <button style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer' }}>
+                <Link to="/checkout" style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer', textDecoration: 'none', borderRadius: '4px' }}>
                     Оформить заказ
-                </button>
+                </Link>
             </div>
         </div>
     );

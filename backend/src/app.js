@@ -7,6 +7,7 @@ const db = require('./models'); // Подключение к базе данны
 const productRoutes = require('./routes/productRoutes'); // Маршруты для товаров
 const authRoutes = require('./routes/authRoutes'); // Маршруты для аутентификации
 const categoryRoutes = require('./routes/categoryRoutes'); // Маршруты для категорий
+const orderRoutes = require('./routes/orderRoutes'); // Маршруты для заказов
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 

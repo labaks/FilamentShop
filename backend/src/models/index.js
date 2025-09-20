@@ -21,10 +21,21 @@ db.Sequelize = Sequelize;
 db.Product = require('./Product')(sequelize, DataTypes);
 db.Category = require('./Category')(sequelize, DataTypes);
 db.User = require('./User')(sequelize, DataTypes);
-// db.Order = require('./Order')(sequelize, DataTypes);
+db.Order = require('./Order')(sequelize, DataTypes);
+db.OrderItem = require('./OrderItem')(sequelize, DataTypes);
 
 // Здесь можно определить ассоциации между моделями, например:
 db.Category.hasMany(db.Product, { foreignKey: 'categoryId' });
 db.Product.belongsTo(db.Category, { foreignKey: 'categoryId' });
+
+// Связи для заказов
+db.User.hasMany(db.Order, { foreignKey: 'userId' });
+db.Order.belongsTo(db.User, { foreignKey: 'userId' });
+
+db.Order.hasMany(db.OrderItem, { foreignKey: 'orderId' });
+db.OrderItem.belongsTo(db.Order, { foreignKey: 'orderId' });
+
+db.Product.hasMany(db.OrderItem, { foreignKey: 'productId' });
+db.OrderItem.belongsTo(db.Product, { foreignKey: 'productId' });
 
 module.exports = db;

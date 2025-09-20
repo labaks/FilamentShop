@@ -14,6 +14,8 @@ const apiClient = axios.create({
 const AdminPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [orders, setOrders] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(true);
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState(null);
 
@@ -41,6 +43,7 @@ const AdminPage = () => {
 
         fetchProducts();
         fetchCategories();
+        fetchOrders();
 
         // Очистка interceptor при размонтировании компонента
         return () => {
@@ -68,6 +71,19 @@ const AdminPage = () => {
             setCategories(response.data);
         } catch (err) {
             console.error('Не удалось загрузить категории', err);
+        }
+    };
+
+    const fetchOrders = async () => {
+        try {
+            setLoadingOrders(true);
+            const response = await apiClient.get('/orders');
+            setOrders(response.data.orders);
+        } catch (err) {
+            setError('Не удалось загрузить заказы.');
+            console.error(err);
+        } finally {
+            setLoadingOrders(false);
         }
     };
 
@@ -139,6 +155,16 @@ const AdminPage = () => {
         });
     };
 
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            await apiClient.put(`/orders/${orderId}/status`, { status: newStatus });
+            // Обновляем статус локально для мгновенного отклика
+            setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? { ...order, status: newStatus } : order));
+        } catch (err) {
+            alert('Не удалось обновить статус заказа.');
+        }
+    };
+
     if (loading) return <div>Загрузка...</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
@@ -195,6 +221,40 @@ const AdminPage = () => {
                     ))}
                 </tbody>
             </table>
+
+            <h2 style={{ marginTop: '3rem' }}>Управление заказами</h2>
+            {loadingOrders ? <p>Загрузка заказов...</p> : (
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>ID Заказа</th>
+                            <th>Пользователь</th>
+                            <th>Сумма</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map(order => (
+                            <tr key={order.id}>
+                                <td>{order.id}</td>
+                                <td>{order.User ? order.User.username : 'Гость'}</td>
+                                <td>{order.totalAmount} лв.</td>
+                                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                    <select value={order.status} onChange={(e) => handleStatusChange(order.id, e.target.value)}>
+                                        <option value="pending">В ожидании</option>
+                                        <option value="processing">В обработке</option>
+                                        <option value="shipped">Отправлен</option>
+                                        <option value="delivered">Доставлен</option>
+                                        <option value="cancelled">Отменен</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };
