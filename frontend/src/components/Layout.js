@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import logo from '../logo.svg';
 
 import ProductPage from '../pages/ProductPage';
 import ProductListPage from '../pages/ProductListPage';
@@ -9,6 +8,7 @@ import AdminPage from '../pages/AdminPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ProtectedRoute from './ProtectedRoute';
+import Header from './Header';
 
 const Layout = () => {
   const [user, setUser] = useState(null);
@@ -38,14 +38,7 @@ const Layout = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <Link to="/"><img src={logo} className="App-logo" alt="logo" width="100" /></Link>
-        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}><h1>Мой Интернет-Магазин</h1></Link>
-        <div style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', display: 'flex', gap: '15px', alignItems: 'center' }}>
-          {user ? (<span>Привет, {user.username} <button onClick={handleLogout} style={{ marginLeft: '10px' }}>Выйти</button></span>) : (<Link to="/login" style={{ color: 'white' }}>Войти</Link>)}
-          {user && user.role === 'admin' && (<Link to="/admin" style={{ color: 'white' }}>Админ</Link>)}
-        </div>
-      </header>
+      <Header user={user} onLogout={handleLogout} />
       <main style={{ padding: '20px' }}>
         <Routes>
           <Route path="/" element={<ProductListPage />} />

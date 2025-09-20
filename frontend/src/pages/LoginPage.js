@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
+import styles from '../styles/AuthForm.module.css'; // Используем общий модуль
+
 const LoginPage = ({ onLogin }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -36,21 +38,21 @@ const LoginPage = ({ onLogin }) => {
     };
 
     return (
-        <div>
-            <h2>Вход для администратора</h2>
+        <div className={styles.formContainer}> {/* Используем класс из общего модуля */}
+            <h2>Вход</h2>
             <form onSubmit={handleLogin}>
-                <div>
+                <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
                     <label>Имя пользователя:</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
-                <div>
+                <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
                     <label>Пароль:</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Войти</button>
+                {error && <p className={styles.errorMessage}>{error}</p>} {/* Используем класс из общего модуля */}
+                <button type="submit" className={styles.formButton}>Войти</button> {/* Используем класс из общего модуля */}
             </form>
-            <p>Нет аккаунта? <Link to="/register">Зарегистрируйтесь</Link></p>
+            <p className={styles.formLink}>Нет аккаунта? <Link to="/register">Зарегистрируйтесь</Link></p> {/* Используем класс из общего модуля */}
         </div>
     );
 };

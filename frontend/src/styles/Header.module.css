@@ -1,0 +1,47 @@
+.header {
+    background-color: #282c34;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Распределяем элементы по краям */
+    color: white;
+    position: relative;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    height: 8vmin;
+    pointer-events: none;
+}
+
+.shopTitle {
+    font-size: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.navContainer {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.navLink {
+    color: #61dafb;
+    text-decoration: none;
+}
+
+.logoutButton {
+    background-color: #61dafb;
+    color: #282c34;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}

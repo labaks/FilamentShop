@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
+import styles from '../styles/AuthForm.module.css';
+
 const RegisterPage = () => {
+    // Импортируем общий модуль стилей
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -35,22 +38,22 @@ const RegisterPage = () => {
     };
 
     return (
-        <div>
+        <div className={styles.formContainer}> {/* Используем класс из общего модуля */}
             <h2>Регистрация нового пользователя</h2>
             <form onSubmit={handleRegister}>
-                <div>
+                <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
                     <label>Имя пользователя:</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
-                <div>
+                <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
                     <label>Пароль:</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
-                <button type="submit">Зарегистрироваться</button>
+                {error && <p className={styles.errorMessage}>{error}</p>} {/* Используем класс из общего модуля */}
+                {success && <p className={styles.successMessage}>{success}</p>} {/* Используем класс из общего модуля */}
+                <button type="submit" className={styles.formButton}>Зарегистрироваться</button> {/* Используем класс из общего модуля */}
             </form>
-            <p>Уже есть аккаунт? <Link to="/login">Войти</Link></p>
+            <p className={styles.formLink}>Уже есть аккаунт? <Link to="/login">Войти</Link></p> {/* Используем класс из общего модуля */}
         </div>
     );
 };

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import styles from '../styles/AdminPage.module.css';
+
 const API_URL = 'http://localhost:5000/api/products';
 
 // Создаем экземпляр axios с настройками
@@ -118,55 +120,49 @@ const AdminPage = () => {
         });
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
-
     if (loading) return <div>Загрузка...</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.adminContainer}>
+            <div className={styles.header}>
                 <h1>Панель администратора</h1>
-                <button onClick={handleLogout}>Выйти</button>
             </div>
 
             {/* Форма для добавления/редактирования */}
-            <form onSubmit={handleSubmit} style={{ marginBottom: '2rem', border: '1px solid #ccc', padding: '1rem' }}>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <h3>{isEditing ? 'Редактировать товар' : 'Добавить новый товар'}</h3>
                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Название товара" required />
                 <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="Цена" required step="0.01" />
                 <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder="Количество на складе" required />
                 <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Описание"></textarea>
                 <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleInputChange} placeholder="URL изображения" />
-                <button type="submit">{isEditing ? 'Сохранить изменения' : 'Добавить товар'}</button>
-                {isEditing && <button type="button" onClick={resetForm}>Отмена</button>}
+                <button type="submit" className={styles.submitButton}>{isEditing ? 'Сохранить изменения' : 'Добавить товар'}</button>
+                {isEditing && <button type="button" onClick={resetForm} className={styles.cancelButton}>Отмена</button>}
             </form>
 
             {/* Список товаров */}
             <h2>Список товаров</h2>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className={styles.table}>
                 <thead>
                     <tr>
-                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>ID</th>
-                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>Название</th>
-                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>Цена</th>
-                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>На складе</th>
-                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>Действия</th>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>На складе</th>
+                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map((product) => (
                         <tr key={product.id}>
-                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.id}</td>
-                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.name}</td>
-                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.price}</td>
-                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.stock}</td>
-                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                            <td>{product.id}</td>
+                            <td>{product.name}</td>
+                            <td>{product.price}</td>
+                            <td>{product.stock}</td>
+                            <td className={styles.actions}>
                                 <button onClick={() => handleEdit(product)}>Редактировать</button>
-                                <button onClick={() => handleDelete(product.id)} style={{ marginLeft: '8px' }}>Удалить</button>
+                                <button onClick={() => handleDelete(product.id)} className={styles.deleteButton}>Удалить</button>
                             </td>
                         </tr>
                     ))}

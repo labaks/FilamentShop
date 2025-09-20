@@ -45,7 +45,7 @@ const ProductListPage = () => {
                             <div style={{ border: '1px solid #ccc', padding: '16px', borderRadius: '8px', width: '200px', cursor: 'pointer' }}>
                                 <img src={product.imageUrl || 'https://via.placeholder.com/150'} alt={product.name} style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
                                 <h3>{product.name}</h3>
-                                <p>Цена: {product.price} руб.</p>
+                                <p>Цена: {product.price} лв.</p>
                                 <p>В наличии: {product.stock} шт.</p>
                             </div>
                         </Link>

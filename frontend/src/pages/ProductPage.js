@@ -44,7 +44,7 @@ const ProductPage = () => {
         <div className="product-page">
             <h1>{product.name}</h1>
             <img src={product.imageUrl || 'https://via.placeholder.com/400'} alt={product.name} style={{ maxWidth: '400px', borderRadius: '8px' }} />
-            <p><strong>Цена:</strong> {product.price} руб.</p>
+            <p><strong>Цена:</strong> {product.price} лв.</p>
             <p><strong>В наличии:</strong> {product.stock} шт.</p>
             <p>{product.description}</p>
             {/* TODO: Добавить кнопку "Добавить в корзину" */}
