@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Неверные учетные данные.' });
         }
 
-        const token = require(jwt).sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+        const token = require(jwt).sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
 
         res.json({ token });
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,10 +16,19 @@ const LoginPage = () => {
                 username,
                 password,
             });
+            const { token } = response.data;
+            const decodedUser = jwtDecode(token);
+
             // Сохраняем токен в localStorage
-            localStorage.setItem('token', response.data.token);
-            // Перенаправляем на админ-панель
-            navigate('/admin');
+            localStorage.setItem('token', token);
+            onLogin(); // Сообщаем родительскому компоненту об успешном входе
+
+            // Перенаправляем в зависимости от роли
+            if (decodedUser.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/'); // Клиентов перенаправляем на главную
+            }
         } catch (err) {
             setError('Неверное имя пользователя или пароль.');
             console.error(err);
@@ -40,6 +50,7 @@ const LoginPage = () => {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <button type="submit">Войти</button>
             </form>
+            <p>Нет аккаунта? <Link to="/register">Зарегистрируйтесь</Link></p>
         </div>
     );
 };

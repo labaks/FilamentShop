@@ -28,19 +28,20 @@ const AdminPage = () => {
 
     // Interceptor для добавления токена в каждый запрос
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-
-        apiClient.interceptors.request.use((config) => {
+        const token = localStorage.getItem('token'); // Токен точно есть, т.к. ProtectedRoute сработал
+        
+        const interceptor = apiClient.interceptors.request.use((config) => {
             config.headers.Authorization = `Bearer ${token}`;
             return config;
         });
 
         fetchProducts();
-    }, [navigate]);
+
+        // Очистка interceptor при размонтировании компонента
+        return () => {
+            apiClient.interceptors.request.eject(interceptor);
+        };
+    }, []);
 
     // Загрузка товаров
     const fetchProducts = async () => {
