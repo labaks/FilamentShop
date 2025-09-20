@@ -19,11 +19,12 @@ db.Sequelize = Sequelize;
 
 // Загружаем модели
 db.Product = require('./Product')(sequelize, DataTypes);
+db.Category = require('./Category')(sequelize, DataTypes);
 db.User = require('./User')(sequelize, DataTypes);
 // db.Order = require('./Order')(sequelize, DataTypes);
 
 // Здесь можно определить ассоциации между моделями, например:
-// db.Product.hasMany(db.OrderProduct);
-// db.User.hasMany(db.Order);
+db.Category.hasMany(db.Product, { foreignKey: 'categoryId' });
+db.Product.belongsTo(db.Category, { foreignKey: 'categoryId' });
 
 module.exports = db;

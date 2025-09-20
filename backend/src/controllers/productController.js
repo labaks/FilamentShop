@@ -1,10 +1,44 @@
 const db = require('../models');
 const Product = db.Product;
+const { Op } = require('sequelize'); // Импортируем операторы Sequelize
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll();
-    res.json(products);
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 8;
+    const { search, categoryId, sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
+    const offset = (page - 1) * limit;
+
+    const where = {};
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } }, // iLike для регистронезависимого поиска
+        { description: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    // Валидация параметров сортировки, чтобы разрешить только определенные поля
+    const allowedSortBy = ['createdAt', 'price', 'name'];
+    const orderField = allowedSortBy.includes(sortBy) ? sortBy : 'createdAt';
+    const orderDirection = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const order = [[orderField, orderDirection]];
+
+    const { count, rows } = await Product.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order,
+    });
+
+    res.json({
+      products: rows,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
   } catch (error) {
     console.error('Ошибка при получении товаров:', error);
     res.status(500).json({ message: 'Ошибка сервера при получении товаров' });
@@ -15,14 +49,14 @@ exports.getAllProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     // name, price, description, imageUrl, stock
-    const { name, price, description, imageUrl, stock } = req.body;
+    const { name, price, description, imageUrl, stock, categoryId } = req.body;
 
     // Простая валидация
-    if (!name || !price) {
-      return res.status(400).json({ message: 'Поля "name" и "price" обязательны' });
+    if (!name || !price || !categoryId) {
+      return res.status(400).json({ message: 'Поля "name", "price" и "categoryId" обязательны' });
     }
 
-    const newProduct = await Product.create({ name, price, description, imageUrl, stock });
+    const newProduct = await Product.create({ name, price, description, imageUrl, stock, categoryId });
     res.status(201).json(newProduct);
   } catch (error) {
     console.error('Ошибка при создании товара:', error);

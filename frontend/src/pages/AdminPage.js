@@ -14,6 +14,7 @@ const apiClient = axios.create({
 const AdminPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [categories, setCategories] = useState([]);
     const [error, setError] = useState(null);
 
     // Состояние для формы
@@ -24,6 +25,7 @@ const AdminPage = () => {
         price: '',
         imageUrl: '',
         stock: '',
+        categoryId: '',
     });
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
@@ -38,6 +40,7 @@ const AdminPage = () => {
         });
 
         fetchProducts();
+        fetchCategories();
 
         // Очистка interceptor при размонтировании компонента
         return () => {
@@ -50,12 +53,21 @@ const AdminPage = () => {
         try {
             setLoading(true);
             const response = await axios.get(API_URL); // Для получения списка токен не нужен
-            setProducts(response.data);
+            setProducts(response.data.products || []); // Извлекаем массив products из ответа
         } catch (err) {
             setError('Не удалось загрузить товары.');
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/categories');
+            setCategories(response.data);
+        } catch (err) {
+            console.error('Не удалось загрузить категории', err);
         }
     };
 
@@ -66,7 +78,12 @@ const AdminPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const productData = { ...formData, price: parseFloat(formData.price), stock: parseInt(formData.stock, 10) };
+        const productData = {
+            ...formData,
+            price: parseFloat(formData.price),
+            stock: parseInt(formData.stock, 10),
+            categoryId: formData.categoryId ? parseInt(formData.categoryId, 10) : null,
+        };
 
         try {
             if (isEditing) {
@@ -93,6 +110,7 @@ const AdminPage = () => {
             price: product.price,
             imageUrl: product.imageUrl || '',
             stock: product.stock,
+            categoryId: product.categoryId || '',
         });
     };
 
@@ -117,6 +135,7 @@ const AdminPage = () => {
             price: '',
             imageUrl: '',
             stock: '',
+            categoryId: '',
         });
     };
 
@@ -136,6 +155,14 @@ const AdminPage = () => {
                 <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="Цена" required step="0.01" />
                 <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder="Количество на складе" required />
                 <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Описание"></textarea>
+                <select name="categoryId" value={formData.categoryId} onChange={handleInputChange} required>
+                    <option value="">-- Выберите категорию --</option>
+                    {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                        </option>
+                    ))}
+                </select>
                 <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleInputChange} placeholder="URL изображения" />
                 <button type="submit" className={styles.submitButton}>{isEditing ? 'Сохранить изменения' : 'Добавить товар'}</button>
                 {isEditing && <button type="button" onClick={resetForm} className={styles.cancelButton}>Отмена</button>}

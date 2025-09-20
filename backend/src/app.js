@@ -6,6 +6,7 @@ require('dotenv').config(); // Для загрузки переменных ок
 const db = require('./models'); // Подключение к базе данных
 const productRoutes = require('./routes/productRoutes'); // Маршруты для товаров
 const authRoutes = require('./routes/authRoutes'); // Маршруты для аутентификации
+const categoryRoutes = require('./routes/categoryRoutes'); // Маршруты для категорий
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
 // Подключаем маршруты для товаров
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 
