@@ -30,3 +30,5 @@ node_modules/
 
 # Кэш
 /frontend/.cache
+
+/backend/public/uploads

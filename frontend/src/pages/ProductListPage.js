@@ -156,7 +156,8 @@ const ProductListPage = () => {
                             <div key={product.id} className={styles.card}>
                                 <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
                                     <div className={styles.imageContainer}>
-                                        <img src={product.imageUrl || 'https://via.placeholder.com/220'} alt={product.name} className={styles.image} />
+                                        {/* Используем первое изображение из массива или заглушку */}
+                                        <img src={product.imageUrls && product.imageUrls.length > 0 ? `http://localhost:5000${product.imageUrls[0]}` : 'https://via.placeholder.com/220'} alt={product.name} className={styles.image} />
                                     </div>
                                     <div className={styles.info}>
                                         <h3>{product.name}</h3>

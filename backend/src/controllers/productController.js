@@ -19,15 +19,6 @@ exports.getAllProducts = async (req, res) => {
         { description: { [Op.iLike]: `%${search}%` } }
       ];
     }
-    if (categoryId) {
-      // Фильтрация по категории для связи многие-ко-многим
-      const includeCategory = {
-        model: Category,
-        where: { id: categoryId },
-        attributes: [] // не включать данные категорий в основной результат
-      };
-      options.include = [includeCategory];
-    }
 
     // Валидация параметров сортировки, чтобы разрешить только определенные поля
     const allowedSortBy = ['createdAt', 'price', 'name'];
@@ -35,13 +26,22 @@ exports.getAllProducts = async (req, res) => {
     const orderDirection = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const order = [[orderField, orderDirection]];
-    
+
     const options = {
       where,
       limit,
       offset,
       order,
+      include: []
     };
+
+    if (categoryId) {
+      options.include.push({
+        model: Category,
+        where: { id: categoryId },
+        attributes: [] // не включать данные категорий в основной результат
+      });
+    }
 
     const { count, rows } = await Product.findAndCountAll(options);
 

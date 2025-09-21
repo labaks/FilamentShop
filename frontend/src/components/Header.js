@@ -18,7 +18,7 @@ const Header = ({ user, onLogout }) => {
                 </Link>
             </div>
             <div className={styles.navContainer}>
-                {(!user || user.role !== 'admin') && (
+                {(user && user.role !== 'admin') && (
                     <Link to="/cart" className={styles.navLink}>
                         <i className="fas fa-shopping-cart"></i> ({cartCount})
                     </Link>

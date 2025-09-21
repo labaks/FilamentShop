@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { CartContext } from '../context/CartContext';
 
 import ProductPage from '../pages/ProductPage';
 import ProductListPage from '../pages/ProductListPage';
@@ -27,6 +28,7 @@ import Header from './Header';
 const Layout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { clearCart } = useContext(CartContext);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -47,6 +49,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    clearCart(); // Очищаем корзину при выходе
     navigate('/login');
   };
 

@@ -90,7 +90,7 @@ exports.getMyOrders = async (req, res) => {
         const orders = await Order.findAll({
             where: { userId },
             order: [['createdAt', 'DESC']],
-            include: [{ model: OrderItem, include: [{ model: Product, attributes: ['name', 'imageUrl'] }] }] // Включаем детали заказа
+            include: [{ model: OrderItem, include: [{ model: Product, attributes: ['name', 'imageUrls'] }] }] // Включаем детали заказа
         });
         res.json(orders);
     } catch (error) {

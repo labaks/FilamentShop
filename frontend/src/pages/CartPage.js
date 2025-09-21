@@ -20,7 +20,7 @@ const CartPage = () => {
             {cartItems.map(item => (
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <img src={item.imageUrl || 'https://via.placeholder.com/50'} alt={item.name} style={{ width: '50px', height: '50px', marginRight: '1rem' }} />
+                        <img src={item.imageUrls && item.imageUrls.length > 0 ? `http://localhost:5000${item.imageUrls[0]}` : 'https://via.placeholder.com/50'} alt={item.name} style={{ width: '50px', height: '50px', marginRight: '1rem', objectFit: 'cover' }} />
                         <div>
                             <h4>{item.name}</h4>
                             <p>Цена: {item.price} лв.</p>
