@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FavoriteContext } from '../context/FavoriteContext';
-import styles from '../styles/ProductCard.module.css'; // Импортируем стили карточки
+import cardStyles from '../styles/ProductCard.module.css'; // Стили для карточки товара
+import pageStyles from '../styles/ProductListPage.module.css'; // Стили для страницы каталога
 import apiClient from '../api/apiClient';
 
 const ProductListPage = () => {
@@ -9,12 +10,14 @@ const ProductListPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Состояния для пагинации и фильтров
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState('createdAt-DESC');
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [filterOptions, setFilterOptions] = useState({ categories: [], manufacturers: [], materials: [] });
+    const [selectedFilters, setSelectedFilters] = useState({ categoryIds: [], manufacturerIds: [], materialIds: [] });
 
     // Состояние для отслеживания первоначальной загрузки
     const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -33,9 +36,12 @@ const ProductListPage = () => {
                     page: currentPage,
                     limit: 8,
                 });
-                if (selectedCategory) {
-                    params.append('categoryId', selectedCategory);
-                }
+
+                // Добавляем массивы ID в параметры, если они не пусты
+                if (selectedFilters.categoryIds.length > 0) params.append('categoryIds', selectedFilters.categoryIds.join(','));
+                if (selectedFilters.manufacturerIds.length > 0) params.append('manufacturerIds', selectedFilters.manufacturerIds.join(','));
+                if (selectedFilters.materialIds.length > 0) params.append('materialIds', selectedFilters.materialIds.join(','));
+
                 const [sortBy, sortOrder] = sortOption.split('-');
                 params.append('sortBy', sortBy);
                 params.append('sortOrder', sortOrder);
@@ -60,12 +66,20 @@ const ProductListPage = () => {
             }
         };
 
-        const fetchCategories = async () => {
+        const fetchFilterOptions = async () => {
             try {
-                const response = await apiClient.get('/categories');
-                setCategories(response.data);
+                const [categoriesRes, manufacturersRes, materialsRes] = await Promise.all([
+                    apiClient.get('/categories'),
+                    apiClient.get('/manufacturers'),
+                    apiClient.get('/materials')
+                ]);
+                setFilterOptions({
+                    categories: categoriesRes.data,
+                    manufacturers: manufacturersRes.data,
+                    materials: materialsRes.data
+                });
             } catch (err) {
-                console.error('Не удалось загрузить категории', err);
+                console.error('Не удалось загрузить опции для фильтров', err);
             }
         };
 
@@ -74,14 +88,14 @@ const ProductListPage = () => {
             fetchProducts();
         }, 300); // Задержка в 300 мс
 
-        fetchCategories();
+        fetchFilterOptions();
 
         // Очистка при размонтировании или повторном вызове эффекта
         return () => {
             clearTimeout(handler);
             controller.abort();
         };
-    }, [currentPage, searchTerm, sortOption, selectedCategory]);
+    }, [currentPage, searchTerm, sortOption, selectedFilters]);
 
     if (loading) {
         return <div>Загрузка товаров...</div>;
@@ -107,84 +121,118 @@ const ProductListPage = () => {
         setCurrentPage(1); // Сбрасываем на первую страницу при новой сортировке
     };
 
-    const handleCategoryChange = (e) => {
-        setSelectedCategory(e.target.value);
+    const handleFilterChange = (filterType, value) => {
+        const id = parseInt(value, 10);
+        setSelectedFilters(prev => {
+            const currentIds = prev[filterType];
+            const newIds = currentIds.includes(id)
+                ? currentIds.filter(currentId => currentId !== id)
+                : [...currentIds, id];
+            return { ...prev, [filterType]: newIds };
+        });
         setCurrentPage(1);
     };
 
     return (
-        <div className="product-list">
-            <h2>Каталог товаров</h2>
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '2rem', alignItems: 'center' }}>
-                <div style={{ flex: '1', maxWidth: '400px' }}>
-                    <input
-                        type="text"
-                        placeholder="Поиск по названию или описанию..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
-                    />
-                </div>
-                <div>
-                    <select value={selectedCategory} onChange={handleCategoryChange} style={{ padding: '0.5rem', fontSize: '1rem' }}>
-                        <option value="">Все категории</option>
-                        {categories.map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+        <div className={pageStyles.pageContainer}>
+            <aside className={pageStyles.filters}>
+                <h4>Фильтры</h4>
+                <div className={pageStyles.filterGroup}>
+                    <h4>Категории</h4>
+                    <div className={pageStyles.checkboxContainer}>
+                        {filterOptions.categories.map(cat => (
+                            <label key={cat.id} className={pageStyles.checkboxLabel}>
+                                <input type="checkbox" value={cat.id} checked={selectedFilters.categoryIds.includes(cat.id)} onChange={(e) => handleFilterChange('categoryIds', e.target.value)} />
+                                {cat.name}
+                            </label>
                         ))}
-                    </select>
+                    </div>
                 </div>
-                <div>
-                    <select value={sortOption} onChange={handleSortChange} style={{ padding: '0.5rem', fontSize: '1rem' }}>
-                        <option value="createdAt-DESC">Сначала новые</option>
-                        <option value="price-ASC">Цена: по возрастанию</option>
-                        <option value="price-DESC">Цена: по убыванию</option>
-                        <option value="name-ASC">Название: А-Я</option>
-                        <option value="name-DESC">Название: Я-А</option>
-                    </select>
+                <div className={pageStyles.filterGroup}>
+                    <h4>Производители</h4>
+                    <div className={pageStyles.checkboxContainer}>
+                        {filterOptions.manufacturers.map(man => (
+                            <label key={man.id} className={pageStyles.checkboxLabel}>
+                                <input type="checkbox" value={man.id} checked={selectedFilters.manufacturerIds.includes(man.id)} onChange={(e) => handleFilterChange('manufacturerIds', e.target.value)} />
+                                {man.name}
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
+                <div className={pageStyles.filterGroup}>
+                    <h4>Материалы</h4>
+                    <div className={pageStyles.checkboxContainer}>
+                        {filterOptions.materials.map(mat => (
+                            <label key={mat.id} className={pageStyles.checkboxLabel}>
+                                <input type="checkbox" value={mat.id} checked={selectedFilters.materialIds.includes(mat.id)} onChange={(e) => handleFilterChange('materialIds', e.target.value)} />
+                                {mat.name}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </aside>
 
-            {products.length === 0 ? (
-                <p>Товаров пока нет.</p>
-            ) : (
-                <>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
-                    {products.map((product) => {
-                        const isFavorite = favoriteIds.has(product.id);
-                        return (
-                            <div key={product.id} className={styles.card}>
-                                <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                    <div className={styles.imageContainer}>
-                                        {/* Используем первое изображение из массива или заглушку */}
-                                        <img src={product.imageUrls && product.imageUrls.length > 0 ? `http://localhost:5000${product.imageUrls[0]}` : 'https://via.placeholder.com/220'} alt={product.name} className={styles.image} />
+            <div className={pageStyles.content}>
+                <div className={pageStyles.topBar}>
+                    <h2>Каталог товаров</h2>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                        <input
+                            type="text"
+                            placeholder="Поиск..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            style={{ padding: '0.5rem', fontSize: '1rem' }}
+                        />
+                        <select value={sortOption} onChange={handleSortChange} style={{ padding: '0.5rem', fontSize: '1rem' }}>
+                            <option value="createdAt-DESC">Сначала новые</option>
+                            <option value="price-ASC">Цена: по возрастанию</option>
+                            <option value="price-DESC">Цена: по убыванию</option>
+                            <option value="name-ASC">Название: А-Я</option>
+                            <option value="name-DESC">Название: Я-А</option>
+                        </select>
+                    </div>
+                </div>
+
+                {products.length === 0 ? (
+                    <p>Товары, соответствующие вашему запросу, не найдены.</p>
+                ) : (
+                    <>
+                        <div className={pageStyles.productGrid}>
+                            {products.map((product) => {
+                                const isFavorite = favoriteIds.has(product.id);
+                                return (
+                                    <div key={product.id} className={cardStyles.card}>
+                                        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                            <div className={cardStyles.imageContainer}>
+                                                <img src={product.imageUrls && product.imageUrls.length > 0 ? `http://localhost:5000${product.imageUrls[0]}` : 'https://via.placeholder.com/220'} alt={product.name} className={cardStyles.image} />
+                                            </div>
+                                            <div className={cardStyles.info}>
+                                                <h3>{product.name}</h3>
+                                                <p>Цена: {product.price} лв.</p>
+                                                <p>В наличии: {product.stock} шт.</p>
+                                            </div>
+                                        </Link>
+                                        <button onClick={() => toggleFavorite(product.id)} className={cardStyles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
+                                            <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
+                                        </button>
                                     </div>
-                                    <div className={styles.info}>
-                                        <h3>{product.name}</h3>
-                                        <p>Цена: {product.price} лв.</p>
-                                        <p>В наличии: {product.stock} шт.</p>
-                                    </div>
-                                </Link>
-                                <button onClick={() => toggleFavorite(product.id)} className={styles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
-                                    <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
+                                );
+                            })}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className={pageStyles.pagination}>
+                                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                    Назад
+                                </button>
+                                <span>Страница {currentPage} из {totalPages}</span>
+                                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                                    Вперед
                                 </button>
                             </div>
-                        );
-                    })}
-                </div>
-                {totalPages > 1 && (
-                    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                            Назад
-                        </button>
-                        <span>Страница {currentPage} из {totalPages}</span>
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                            Вперед
-                        </button>
-                    </div>
+                        )}
+                    </>
                 )}
-                </>
-            )}
+            </div>
         </div>
     );
 };

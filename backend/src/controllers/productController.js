@@ -9,7 +9,7 @@ exports.getAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 8;
-    const { search, categoryId, sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
+    const { search, categoryIds, manufacturerIds, materialIds, sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};
@@ -35,11 +35,27 @@ exports.getAllProducts = async (req, res) => {
       include: []
     };
 
-    if (categoryId) {
+    if (categoryIds) {
       options.include.push({
         model: Category,
-        where: { id: categoryId },
+        where: { id: { [Op.in]: categoryIds.split(',') } },
         attributes: [] // не включать данные категорий в основной результат
+      });
+    }
+
+    if (manufacturerIds) {
+      options.include.push({
+        model: Manufacturer,
+        where: { id: { [Op.in]: manufacturerIds.split(',') } },
+        attributes: []
+      });
+    }
+
+    if (materialIds) {
+      options.include.push({
+        model: Material,
+        where: { id: { [Op.in]: materialIds.split(',') } },
+        attributes: []
       });
     }
 

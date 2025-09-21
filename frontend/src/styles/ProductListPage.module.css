@@ -1,0 +1,89 @@
+.pageContainer {
+    display: flex;
+    gap: 2rem;
+}
+
+.filters {
+    flex: 0 0 250px;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    align-self: flex-start; /* Чтобы фильтры не растягивались по высоте */
+}
+
+.filters>h4 {
+    font-size: 2rem;
+    margin: 0 0 2rem;
+    padding-bottom: 1rem;
+}
+
+.filterGroup {
+    margin-bottom: 1.5rem;
+}
+
+.filterGroup h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+    text-align: start;
+}
+
+.checkboxContainer {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px; /* для полосы прокрутки */
+}
+
+.checkboxLabel {
+    display: block;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    text-align: start;
+}
+
+.checkboxLabel input {
+    margin-right: 8px;
+}
+
+.content {
+    flex-grow: 1;
+}
+
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.topBar h2 {
+    margin: 0;
+}
+
+.productGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+}
+
+.pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

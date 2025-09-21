@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { CartContext } from '../context/CartContext';
 import { FavoriteContext } from '../context/FavoriteContext';
@@ -23,7 +23,7 @@ const ProductPage = () => {
     const [reviewToDelete, setReviewToDelete] = useState(null);
     const [error, setError] = useState(null);
     const [reviewError, setReviewError] = useState('');
-    const { addToCart } = useContext(CartContext);
+    const { cartItems, addToCart, updateQuantity, removeFromCart } = useContext(CartContext);
     const { favoriteIds, toggleFavorite } = useContext(FavoriteContext);
 
     const [currentUser, setCurrentUser] = useState(null);
@@ -162,18 +162,26 @@ const ProductPage = () => {
     }
 
     const isFavorite = favoriteIds.has(product.id);
+    const itemInCart = cartItems.find(item => item.id === product.id);
+    const quantityInCart = itemInCart ? itemInCart.quantity : 0;
 
     return (
         <div className={styles.pageContainer}>
+            <div className={styles.backLinkContainer}>
+                <Link to="/" className={styles.backLink}>← Назад в каталог</Link>
+            </div>
             <div className={styles.gridContainer}>
                 <div className={styles.imageContainer}>
+                    <button onClick={() => toggleFavorite(product.id)} className={styles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
+                        <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
+                    </button>
                     <img src={mainImage ? `http://localhost:5000${mainImage}` : 'https://via.placeholder.com/500'} alt={product.name} className={styles.mainImage} />
                     {product.imageUrls && product.imageUrls.length > 1 && (
                         <div className={styles.thumbnailContainer}>
                             {product.imageUrls.map((url, index) => (
-                                <img key={index} src={`http://localhost:5000${url}`} alt={`Thumbnail ${index + 1}`} 
-                                     className={`${styles.thumbnail} ${url === mainImage ? styles.activeThumbnail : ''}`}
-                                     onClick={() => setMainImage(url)} />
+                                <img key={index} src={`http://localhost:5000${url}`} alt={`Thumbnail ${index + 1}`}
+                                    className={`${styles.thumbnail} ${url === mainImage ? styles.activeThumbnail : ''}`}
+                                    onClick={() => setMainImage(url)} />
                             ))}
                         </div>
                     )}
@@ -181,9 +189,6 @@ const ProductPage = () => {
                 <div className={styles.detailsContainer}>
                     <div className={styles.titleContainer}>
                         <h1 className={styles.title}>{product.name}</h1>
-                        <button onClick={() => toggleFavorite(product.id)} className={styles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
-                            <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
-                        </button>
                     </div>
 
                     {product.reviewCount > 0 && (
@@ -220,9 +225,21 @@ const ProductPage = () => {
                         </span>
                     </p>
                     <p className={styles.description}>{product.description}</p>
-                    <button onClick={() => addToCart(product)} disabled={product.stock === 0} className={styles.addToCartButton}>
-                        Добавить в корзину
-                    </button>
+                    {(!currentUser || currentUser.role !== 'admin') && (
+                        <div className={styles.actionsContainer}>
+                            {quantityInCart > 0 && (
+                                // Показываем счетчик, только если товар уже в корзине
+                                    <div className={styles.quantitySelector}>
+                                        <button onClick={() => quantityInCart === 1 ? removeFromCart(product.id) : updateQuantity(product.id, quantityInCart - 1)}>-</button>
+                                        <input type="number" value={quantityInCart} readOnly />
+                                        <button onClick={() => updateQuantity(product.id, quantityInCart + 1)} disabled={quantityInCart >= product.stock}>+</button>
+                                    </div>
+                            )}
+                            <button onClick={() => addToCart(product, 1)} disabled={product.stock === 0 || quantityInCart >= product.stock} className={styles.addToCartButton}>
+                                Добавить в корзину <i className="fas fa-plus" style={{ marginLeft: '10px' }}></i>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -237,12 +254,12 @@ const ProductPage = () => {
                                     <div className={styles.starRatingInput}>
                                         {[...Array(5)].map((_, index) => {
                                             const ratingValue = index + 1;
-                                            return (<label key={ratingValue}><input type="radio" name="edit-rating" checked={ratingValue === editingReview.rating} onChange={() => setEditingReview({...editingReview, rating: ratingValue})} style={{display: 'none'}} /><i className="fas fa-star" style={{ color: ratingValue <= editingReview.rating ? '#ffc107' : '#e4e5e9', cursor: 'pointer', fontSize: '1.5rem' }}></i></label>);
+                                            return (<label key={ratingValue}><input type="radio" name="edit-rating" checked={ratingValue === editingReview.rating} onChange={() => setEditingReview({ ...editingReview, rating: ratingValue })} style={{ display: 'none' }} /><i className="fas fa-star" style={{ color: ratingValue <= editingReview.rating ? '#ffc107' : '#e4e5e9', cursor: 'pointer', fontSize: '1.5rem' }}></i></label>);
                                         })}
                                     </div>
-                                    <textarea rows="3" value={editingReview.comment} onChange={(e) => setEditingReview({...editingReview, comment: e.target.value})}></textarea>
+                                    <textarea rows="3" value={editingReview.comment} onChange={(e) => setEditingReview({ ...editingReview, comment: e.target.value })}></textarea>
                                     <button onClick={handleUpdateReview} className={styles.addToCartButton}>Сохранить</button>
-                                    <button onClick={handleCancelEdit} style={{marginLeft: '10px'}}>Отмена</button>
+                                    <button onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>Отмена</button>
                                 </div>
                             ) : (
                                 // Отображение отзыва
@@ -258,7 +275,7 @@ const ProductPage = () => {
                                             <button onClick={() => handleEditClick(review)} title="Редактировать">
                                                 <i className="fas fa-pencil-alt"></i>
                                             </button>
-                                            <button onClick={() => openDeleteModal(review)} title="Удалить" style={{color: '#dc3545'}}>
+                                            <button onClick={() => openDeleteModal(review)} title="Удалить" style={{ color: '#dc3545' }}>
                                                 <i className="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -303,7 +320,11 @@ const ProductPage = () => {
                         onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
                     ></textarea>
                     {reviewError && <p style={{ color: 'red' }}>{reviewError}</p>}
-                    <button type="submit" className={styles.addToCartButton}>Отправить отзыв</button>
+                    <div className={styles.formActions}>
+                        <button type="submit" className={styles.addToCartButton} style={{ backgroundColor: '#007bff' }}>
+                            <i className="fas fa-paper-plane" style={{ marginRight: '10px' }}></i> Отправить отзыв
+                        </button>
+                    </div>
                 </form>
             </div>
             <Modal

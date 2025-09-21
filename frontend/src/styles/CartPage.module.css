@@ -1,0 +1,148 @@
+.cartContainer {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cartContainer h2 {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.emptyCart {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.emptyCart a {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.cartItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+}
+
+.itemInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.itemInfo img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.itemInfo h4 {
+    margin: 0;
+}
+
+.itemInfo p {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+.itemControls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.quantitySelector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.quantitySelector button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    color: #555;
+}
+
+.quantitySelector input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    font-size: 1rem;
+    font-weight: bold;
+    -moz-appearance: textfield;
+}
+
+.quantitySelector input::-webkit-outer-spin-button,
+.quantitySelector input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.itemTotal {
+    font-weight: bold;
+    width: 100px;
+    text-align: right;
+}
+
+.removeButton {
+    color: #dc3545;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.removeButton:hover {
+    transform: scale(1.2);
+}
+
+.cartSummary {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.cartSummary h3 {
+    margin-bottom: 1.5rem;
+}
+
+.clearButton {
+    margin-right: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #6c757d;
+    background-color: transparent;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.checkoutButton {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
