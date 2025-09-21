@@ -6,7 +6,7 @@ exports.createOrder = async (req, res) => {
     const t = await sequelize.transaction(); // Начинаем транзакцию
 
     try {
-        const { customerInfo, cartItems, userId } = req.body;
+        const { customerInfo, cartItems, userId, deliveryMethod, deliveryType } = req.body;
 
         if (!customerInfo || !cartItems || cartItems.length === 0) {
             return res.status(400).json({ message: 'Некорректные данные для создания заказа.' });
@@ -30,6 +30,12 @@ exports.createOrder = async (req, res) => {
             userId, // Может быть null для гостевых заказов
             customerInfo,
             totalAmount,
+            // Добавляем информацию о доставке
+            deliveryInfo: {
+                method: deliveryMethod,
+                type: deliveryType,
+                // Сюда можно будет добавить ID офиса или полный адрес
+            },
             status: 'pending',
         }, { transaction: t });
 

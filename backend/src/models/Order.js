@@ -20,6 +20,10 @@ module.exports = (sequelize) => {
             type: DataTypes.JSONB, // Используем JSONB для гибкого хранения данных клиента
             allowNull: false,
         },
+        deliveryInfo: {
+            type: DataTypes.JSONB,
+            allowNull: true,
+        },
         // UserId будет добавлено автоматически через ассоциацию
     }, {
         tableName: 'orders',

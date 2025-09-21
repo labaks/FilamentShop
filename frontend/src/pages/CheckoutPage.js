@@ -72,6 +72,8 @@ const CheckoutPage = () => {
             customerInfo,
             cartItems,
             userId,
+            deliveryMethod,
+            deliveryType,
         };
 
         try {

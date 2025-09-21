@@ -39,7 +39,7 @@ const AdminOrderDetailPage = () => {
     if (!order) return <div>Заказ не найден.</div>;
 
     const { customerInfo } = order;
-
+    
     return (
         <div>
             <Link to="/admin">← Назад к списку заказов</Link>
@@ -59,6 +59,12 @@ const AdminOrderDetailPage = () => {
                     <p><strong>Email:</strong> {customerInfo.email}</p>
                     <p><strong>Телефон:</strong> {customerInfo.phone}</p>
                     <p><strong>Адрес:</strong> {customerInfo.address}</p>
+                    {order.deliveryInfo && (
+                        <div style={{marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem'}}>
+                            <p><strong>Способ доставки:</strong> {order.deliveryInfo.method}</p>
+                            <p><strong>Тип доставки:</strong> {order.deliveryInfo.type === 'office' ? 'До офиса' : 'До адреса'}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
