@@ -77,3 +77,33 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: 'Ошибка сервера' });
     }
 };
+
+exports.getUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId, {
+            attributes: ['id', 'username', 'name', 'email', 'phone', 'address']
+        });
+        if (!user) {
+            return res.status(404).json({ message: 'Пользователь не найден.' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Ошибка сервера при получении профиля.' });
+    }
+};
+
+exports.updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, email, phone, address } = req.body;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Пользователь не найден.' });
+        }
+        await user.update({ name, email, phone, address });
+        res.json({ message: 'Профиль успешно обновлен.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Ошибка сервера при обновлении профиля.' });
+    }
+};

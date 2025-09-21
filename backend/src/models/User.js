@@ -16,6 +16,23 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: 'client',
     },
+    // Новые поля для информации о доставке
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    address: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    }
   }, {
     tableName: 'users',
     timestamps: true,
