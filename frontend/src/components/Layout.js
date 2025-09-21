@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 import ProductPage from '../pages/ProductPage';
@@ -13,11 +13,15 @@ import CartPage from '../pages/CartPage';
 import CheckoutPage from '../pages/CheckoutPage';
 import AdminOrderDetailPage from '../pages/AdminOrderDetailPage';
 import AdminProducts from '../pages/AdminProducts';
+import AdminProductFormPage from '../pages/AdminProductFormPage';
+import AdminCategories from '../pages/AdminCategories';
+import AdminGenericCrud from '../pages/AdminGenericCrud';
 import AdminOrders from '../pages/AdminOrders';
 import ProfilePage from '../pages/ProfilePage';
 import UserProfile from '../pages/UserProfile';
 import UserOrders from '../pages/UserOrders';
 import UserFavorites from '../pages/UserFavorites';
+import UserSecurity from '../pages/UserSecurity';
 import Header from './Header';
 
 const Layout = () => {
@@ -61,18 +65,24 @@ const Layout = () => {
             path="/admin"
             element={<AdminRoute><AdminPage /></AdminRoute>}
           >
-            <Route index element={<AdminProducts />} />
+            <Route index element={<Navigate to="products" replace />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="products/new" element={<AdminProductFormPage />} />
+            <Route path="products/:id" element={<AdminProductFormPage />} />
+            <Route path="categories" element={<AdminCategories />} />
+            <Route path="manufacturers" element={<AdminGenericCrud apiPath="/manufacturers" title="Производители" placeholder="Название производителя" />} />
+            <Route path="materials" element={<AdminGenericCrud apiPath="/materials" title="Материалы" placeholder="Название материала" />} />
             <Route path="orders" element={<AdminOrders />} />
           </Route>
           <Route
             path="/profile"
             element={<UserRoute><ProfilePage /></UserRoute>}
           >
-            <Route index element={<UserProfile />} />
+            <Route index element={<Navigate to="me" replace />} />
             <Route path="me" element={<UserProfile />} />
             <Route path="orders" element={<UserOrders />} />
             <Route path="favorites" element={<UserFavorites />} />
+            <Route path="security" element={<UserSecurity />} />
           </Route>
           <Route path="/admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />
         </Routes>

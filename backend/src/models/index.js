@@ -24,10 +24,18 @@ db.User = require('./User')(sequelize, DataTypes);
 db.Order = require('./Order')(sequelize, DataTypes);
 db.OrderItem = require('./OrderItem')(sequelize, DataTypes);
 db.Favorite = require('./Favorite')(sequelize, DataTypes);
+db.Review = require('./Review')(sequelize, DataTypes);
+db.Manufacturer = require('./Manufacturer')(sequelize, DataTypes);
+db.Material = require('./Material')(sequelize, DataTypes);
 
 // Здесь можно определить ассоциации между моделями, например:
-db.Category.hasMany(db.Product, { foreignKey: 'categoryId' });
-db.Product.belongsTo(db.Category, { foreignKey: 'categoryId' });
+// Связь многие-ко-многим между Товарами и Категориями
+db.Product.belongsToMany(db.Category, { through: 'ProductCategory' });
+db.Category.belongsToMany(db.Product, { through: 'ProductCategory' });
+db.Product.belongsToMany(db.Manufacturer, { through: 'ProductManufacturer' });
+db.Manufacturer.belongsToMany(db.Product, { through: 'ProductManufacturer' });
+db.Product.belongsToMany(db.Material, { through: 'ProductMaterial' });
+db.Material.belongsToMany(db.Product, { through: 'ProductMaterial' });
 
 // Связи для заказов
 db.User.hasMany(db.Order, { foreignKey: 'userId' });
@@ -48,5 +56,12 @@ db.User.hasMany(db.Favorite, { foreignKey: 'userId' });
 db.Favorite.belongsTo(db.User, { foreignKey: 'userId' });
 db.Product.hasMany(db.Favorite, { foreignKey: 'productId' });
 db.Favorite.belongsTo(db.Product, { foreignKey: 'productId' });
+
+// Связи для отзывов
+db.User.hasMany(db.Review, { foreignKey: 'userId' });
+db.Review.belongsTo(db.User, { foreignKey: 'userId' });
+
+db.Product.hasMany(db.Review, { foreignKey: 'productId' });
+db.Review.belongsTo(db.Product, { foreignKey: 'productId' });
 
 module.exports = db;

@@ -19,11 +19,21 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10, 2), // 10 цифр всего, 2 после запятой
       allowNull: false,
     },
-    imageUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    imageUrls: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: [],
     },
     stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    averageRating: {
+      type: DataTypes.DECIMAL(3, 2),
+      allowNull: true,
+      defaultValue: null,
+    },
+    reviewCount: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,

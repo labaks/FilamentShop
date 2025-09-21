@@ -36,6 +36,10 @@
     text-decoration: none;
 }
 
+.navLink i {
+    margin-right: 5px;
+}
+
 .userActions {
     display: flex;
     align-items: center;

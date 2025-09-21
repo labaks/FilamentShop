@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FavoriteContext } from '../context/FavoriteContext';
 import styles from '../styles/ProductCard.module.css'; // Импортируем стили карточки
+import apiClient from '../api/apiClient';
 
 const ProductListPage = () => {
     const { favoriteIds, toggleFavorite } = useContext(FavoriteContext);
@@ -44,7 +44,7 @@ const ProductListPage = () => {
                     params.append('search', searchTerm);
                 }
                 // Запрос к нашему API
-                const response = await axios.get(`http://localhost:5000/api/products?${params.toString()}`, {
+                const response = await apiClient.get(`/products?${params.toString()}`, {
                     signal: controller.signal // Передаем сигнал для отмены
                 });
                 setProducts(response.data.products);
@@ -62,7 +62,7 @@ const ProductListPage = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/categories');
+                const response = await apiClient.get('/categories');
                 setCategories(response.data);
             } catch (err) {
                 console.error('Не удалось загрузить категории', err);

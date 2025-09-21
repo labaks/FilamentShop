@@ -18,20 +18,27 @@ const Header = ({ user, onLogout }) => {
                 </Link>
             </div>
             <div className={styles.navContainer}>
-                <Link to="/cart" className={styles.navLink}>
-                    <i className="fas fa-shopping-cart"></i> ({cartCount})
-                </Link>
+                {(!user || user.role !== 'admin') && (
+                    <Link to="/cart" className={styles.navLink}>
+                        <i className="fas fa-shopping-cart"></i> ({cartCount})
+                    </Link>
+                )}
                 {user ? (
                     <span className={styles.userActions}>
-                        <Link to="/profile" className={styles.navLink}>
-                            <i className="fas fa-user"></i> {user.username}
-                        </Link>
+                        {user.role === 'admin' ? (
+                            <Link to="/admin" className={styles.navLink}>
+                                <i className="fas fa-user-shield"></i> {user.username}
+                            </Link>
+                        ) : (
+                            <Link to="/profile" className={styles.navLink}>
+                                <i className="fas fa-user"></i> {user.username}
+                            </Link>
+                        )}
                         <button onClick={onLogout} className={styles.logoutButton} title="Выйти"><i className="fas fa-sign-out-alt"></i></button>
                     </span>
                 ) : (
                     <Link to="/login" className={styles.navLink}>Войти</Link>
                 )}
-                {user && user.role === 'admin' && (<Link to="/admin" className={styles.navLink}>Админ-панель</Link>)}
             </div>
         </header>
     );

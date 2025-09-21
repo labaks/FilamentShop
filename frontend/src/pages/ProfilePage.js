@@ -17,6 +17,9 @@ const ProfilePage = () => {
                     <NavLink to="/profile/favorites" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
                         Избранное
                     </NavLink>
+                    <NavLink to="/profile/security" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
+                        Безопасность
+                    </NavLink>
                 </nav>
             </aside>
             <main className={styles.content}>

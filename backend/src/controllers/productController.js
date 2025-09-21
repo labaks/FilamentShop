@@ -1,5 +1,8 @@
 const db = require('../models');
 const Product = db.Product;
+const Category = db.Category;
+const Manufacturer = db.Manufacturer;
+const Material = db.Material;
 const { Op } = require('sequelize'); // Импортируем операторы Sequelize
 
 exports.getAllProducts = async (req, res) => {
@@ -17,7 +20,13 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
     if (categoryId) {
-      where.categoryId = categoryId;
+      // Фильтрация по категории для связи многие-ко-многим
+      const includeCategory = {
+        model: Category,
+        where: { id: categoryId },
+        attributes: [] // не включать данные категорий в основной результат
+      };
+      options.include = [includeCategory];
     }
 
     // Валидация параметров сортировки, чтобы разрешить только определенные поля
@@ -26,13 +35,15 @@ exports.getAllProducts = async (req, res) => {
     const orderDirection = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const order = [[orderField, orderDirection]];
-
-    const { count, rows } = await Product.findAndCountAll({
+    
+    const options = {
       where,
       limit,
       offset,
       order,
-    });
+    };
+
+    const { count, rows } = await Product.findAndCountAll(options);
 
     res.json({
       products: rows,
@@ -49,14 +60,27 @@ exports.getAllProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     // name, price, description, imageUrl, stock
-    const { name, price, description, imageUrl, stock, categoryId } = req.body;
+    const { name, price, description, imageUrls, stock, categoryIds, manufacturerIds, materialIds } = req.body;
 
     // Простая валидация
-    if (!name || !price || !categoryId) {
-      return res.status(400).json({ message: 'Поля "name", "price" и "categoryId" обязательны' });
+    if (!name || !price) {
+      return res.status(400).json({ message: 'Поля "name" и "price" обязательны' });
     }
 
-    const newProduct = await Product.create({ name, price, description, imageUrl, stock, categoryId });
+    const newProduct = await Product.create({ name, price, description, imageUrls, stock });
+
+    if (categoryIds && categoryIds.length > 0) {
+      await newProduct.setCategories(categoryIds);
+    }
+
+    if (manufacturerIds && manufacturerIds.length > 0) {
+      await newProduct.setManufacturers(manufacturerIds);
+    }
+
+    if (materialIds && materialIds.length > 0) {
+      await newProduct.setMaterials(materialIds);
+    }
+
     res.status(201).json(newProduct);
   } catch (error) {
     console.error('Ошибка при создании товара:', error);
@@ -68,7 +92,13 @@ exports.createProduct = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByPk(id);
+    const product = await Product.findByPk(id, {
+      include: [
+        { model: Category },
+        { model: Manufacturer },
+        { model: Material },
+      ]
+    });
     if (!product) {
       return res.status(404).json({ message: 'Товар не найден' });
     }
@@ -90,7 +120,21 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Обновляем товар данными из тела запроса
-    const updatedProduct = await product.update(req.body);
+    const { categoryIds, manufacturerIds, materialIds, ...productData } = req.body;
+    const updatedProduct = await product.update(productData);
+
+    if (categoryIds) { // Позволяем передавать пустой массив для удаления всех категорий
+      await updatedProduct.setCategories(categoryIds);
+    }
+
+    if (manufacturerIds) {
+      await updatedProduct.setManufacturers(manufacturerIds);
+    }
+
+    if (materialIds) {
+      await updatedProduct.setMaterials(materialIds);
+    }
+
     res.json(updatedProduct);
   } catch (error) {
     console.error(`Ошибка при обновлении товара с ID ${req.params.id}:`, error);

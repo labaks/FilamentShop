@@ -19,10 +19,32 @@
     overflow: hidden;
 }
 
-.image {
+.mainImage {
     width: 100%;
     height: auto;
     display: block;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.thumbnailContainer {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.thumbnail:hover {
+    border-color: #ccc;
 }
 
 .detailsContainer {
@@ -103,4 +125,105 @@
 .addToCartButton:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+.manufacturer {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.categories {
+    margin-bottom: 1rem;
+}
+
+.categoryTag {
+    display: inline-block;
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-size: 0.85rem;
+}
+
+.ratingSummary {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.reviewsSection {
+    margin-top: 3rem;
+    border-top: 1px solid #eee;
+    padding-top: 2rem;
+}
+
+.review {
+    border-bottom: 1px solid #eee;
+    padding: 1.5rem 0;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.reviewHeader strong {
+    font-size: 1.1rem;
+}
+
+.review p {
+    margin: 0.5rem 0;
+}
+
+.review small {
+    color: #888;
+}
+
+.reviewActions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 10px;
+}
+
+.reviewActions button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+}
+.reviewActions button:hover {
+    transform: scale(1.2);
+    transition: transform 0.2s ease;
+}
+
+
+.reviewForm {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.reviewForm h4 {
+    margin-top: 0;
+}
+
+.reviewForm textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.starRatingInput {
+    display: flex;
+    gap: 5px;
 }

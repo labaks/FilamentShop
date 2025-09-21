@@ -1,33 +1,51 @@
 .adminContainer {
+    display: flex;
+    gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.sidebar {
+    flex: 0 0 250px;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-right: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.sidebar h1 {
+    margin-top: 0;
     margin-bottom: 2rem;
+    font-size: 1.5rem;
 }
 
 .nav {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .link {
-    margin-right: 1.5rem;
     text-decoration: none;
-    color: #007bff;
-    font-size: 1.1rem;
-    padding: 0.5rem;
+    color: #495057;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.link:hover {
+    background-color: #e9ecef;
 }
 
 .activeLink {
     composes: link;
     font-weight: bold;
-    border-bottom: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+}
+
+.content {
+    flex-grow: 1;
 }
 
 .form {
@@ -41,7 +59,8 @@
 }
 
 .form input,
-.form textarea {
+.form textarea,
+.form select {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ccc;
@@ -59,6 +78,7 @@
 .submitButton {
     background-color: #28a745;
     color: white;
+    padding: 0.75rem;
 }
 
 .cancelButton {
@@ -86,6 +106,7 @@
 .actions button {
     margin-right: 8px;
     padding: 5px 10px;
+    background: none;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -95,4 +116,61 @@
     background-color: #dc3545;
     color: white;
     border-color: #dc3545;
+}
+
+.checkboxGroup {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.checkboxGroup label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.checkboxContainer {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.checkboxLabel {
+    display: block;
+    font-weight: normal;
+}
+
+.imagePreviewContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.imagePreviewWrapper {
+    position: relative;
+}
+
+.imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.removeImageButton {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
 }

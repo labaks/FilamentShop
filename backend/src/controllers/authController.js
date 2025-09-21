@@ -47,3 +47,33 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: 'Ошибка при входе в систему.', error: error.message });
     }
 };
+
+exports.changePassword = async (req, res) => {
+    try {
+        const userId = req.user.id; // ID из токена
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Все поля обязательны.' });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Пользователь не найден.' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Неверный текущий пароль.' });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedNewPassword;
+        await user.save();
+
+        res.json({ message: 'Пароль успешно изменен.' });
+    } catch (error) {
+        console.error('Ошибка при смене пароля:', error);
+        res.status(500).json({ message: 'Ошибка сервера' });
+    }
+};

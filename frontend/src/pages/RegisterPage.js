@@ -8,6 +8,7 @@ const RegisterPage = () => {
     // Импортируем общий модуль стилей
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
@@ -47,7 +48,13 @@ const RegisterPage = () => {
                 </div>
                 <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
                     <label>Пароль:</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <div className={styles.passwordInputContainer}>
+                        <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <i 
+                            className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} ${styles.passwordToggleIcon}`} 
+                            onClick={() => setShowPassword(!showPassword)}
+                        ></i>
+                    </div>
                 </div>
                 {error && <p className={styles.errorMessage}>{error}</p>} {/* Используем класс из общего модуля */}
                 {success && <p className={styles.successMessage}>{success}</p>} {/* Используем класс из общего модуля */}

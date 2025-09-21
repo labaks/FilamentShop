@@ -1,5 +1,6 @@
 // backend/src/app.js
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 
 require('dotenv').config(); // Для загрузки переменных окружения из .env файла
@@ -9,12 +10,19 @@ const authRoutes = require('./routes/authRoutes'); // Маршруты для а
 const categoryRoutes = require('./routes/categoryRoutes'); // Маршруты для категорий
 const orderRoutes = require('./routes/orderRoutes'); // Маршруты для заказов
 const favoriteRoutes = require('./routes/favoriteRoutes'); // Маршруты для избранного
+const reviewRoutes = require('./routes/reviewRoutes'); // Маршруты для отзывов
+const manufacturerRoutes = require('./routes/manufacturerRoutes');
+const materialRoutes = require('./routes/materialRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
 // Middleware
 app.use(cors()); // Разрешаем кросс-доменные запросы
 app.use(express.json()); // Позволяем серверу принимать JSON в теле запроса
+
+// Раздача статических файлов из папки 'public'
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Простой тестовый маршрут
 app.get('/', (req, res) => {
@@ -27,6 +35,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/manufacturers', manufacturerRoutes);
+app.use('/api/materials', materialRoutes);
+app.use('/api/upload', uploadRoutes);
 
 const PORT = process.env.PORT || 5000;
 

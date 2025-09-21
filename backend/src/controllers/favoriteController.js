@@ -11,7 +11,12 @@ exports.getFavorites = async (req, res) => {
                 through: { attributes: [] } // Не включать данные из промежуточной таблицы
             }]
         });
-        res.json(user.Products || []);
+
+        if (!user) {
+            return res.json([]); // Если пользователь не найден, возвращаем пустой массив
+        }
+
+        res.json(user.Products || []); // Если пользователь найден, возвращаем его избранные товары
     } catch (error) {
         console.error('Ошибка при получении избранного:', error);
         res.status(500).json({ message: 'Ошибка сервера' });

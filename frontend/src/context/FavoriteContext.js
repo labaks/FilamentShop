@@ -1,9 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:5000/api',
-});
+import apiClient from '../api/apiClient';
 
 export const FavoriteContext = createContext();
 
@@ -17,9 +13,7 @@ export const FavoriteProvider = ({ children }) => {
             return;
         }
         try {
-            const response = await apiClient.get('/favorites', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await apiClient.get('/favorites');
             const ids = new Set(response.data.map(fav => fav.id));
             setFavoriteIds(ids);
         } catch (error) {
@@ -38,14 +32,13 @@ export const FavoriteProvider = ({ children }) => {
             return;
         }
         
-        const headers = { Authorization: `Bearer ${token}` };
         const isFavorite = favoriteIds.has(productId);
 
         try {
             if (isFavorite) {
-                await apiClient.delete(`/favorites/${productId}`, { headers });
+                await apiClient.delete(`/favorites/${productId}`);
             } else {
-                await apiClient.post(`/favorites/${productId}`, {}, { headers });
+                await apiClient.post(`/favorites/${productId}`, {});
             }
             await fetchFavorites(); // Обновляем список после изменения
         } catch (error) {

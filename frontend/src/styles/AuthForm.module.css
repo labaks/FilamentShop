@@ -18,6 +18,12 @@
     margin-bottom: 1rem;
 }
 
+.passwordInputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .formGroup label {
     display: block;
     margin-bottom: 0.5rem;
@@ -27,11 +33,19 @@
 }
 
 .formGroup input {
-    width: calc(100% - 1rem); /* Учитываем padding */
+    width: 100%;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
+    box-sizing: border-box; /* Чтобы padding не влиял на общую ширину */
+}
+
+.passwordToggleIcon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #555;
 }
 
 .formButton {
