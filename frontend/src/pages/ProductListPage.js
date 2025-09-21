@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { FavoriteContext } from '../context/FavoriteContext';
+import styles from '../styles/ProductCard.module.css'; // Импортируем стили карточки
 
 const ProductListPage = () => {
+    const { favoriteIds, toggleFavorite } = useContext(FavoriteContext);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -147,16 +150,26 @@ const ProductListPage = () => {
             ) : (
                 <>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
-                    {products.map((product) => (
-                        <Link to={`/products/${product.id}`} key={product.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <div style={{ border: '1px solid #ccc', padding: '16px', borderRadius: '8px', width: '200px', cursor: 'pointer' }}>
-                                <img src={product.imageUrl || 'https://via.placeholder.com/150'} alt={product.name} style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
-                                <h3>{product.name}</h3>
-                                <p>Цена: {product.price} лв.</p>
-                                <p>В наличии: {product.stock} шт.</p>
+                    {products.map((product) => {
+                        const isFavorite = favoriteIds.has(product.id);
+                        return (
+                            <div key={product.id} className={styles.card}>
+                                <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <div className={styles.imageContainer}>
+                                        <img src={product.imageUrl || 'https://via.placeholder.com/220'} alt={product.name} className={styles.image} />
+                                    </div>
+                                    <div className={styles.info}>
+                                        <h3>{product.name}</h3>
+                                        <p>Цена: {product.price} лв.</p>
+                                        <p>В наличии: {product.stock} шт.</p>
+                                    </div>
+                                </Link>
+                                <button onClick={() => toggleFavorite(product.id)} className={styles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
+                                    <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
+                                </button>
                             </div>
-                        </Link>
-                    ))}
+                        );
+                    })}
                 </div>
                 {totalPages > 1 && (
                     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '10px' }}>

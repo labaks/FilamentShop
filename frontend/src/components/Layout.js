@@ -7,13 +7,17 @@ import ProductListPage from '../pages/ProductListPage';
 import AdminPage from '../pages/AdminPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
-import ProtectedRoute from './ProtectedRoute';
-import CartPage from '../pages/CartPage';
-import MyOrdersPage from '../pages/MyOrdersPage';
+import AdminRoute from './AdminRoute';
+import UserRoute from './UserRoute';
+import CartPage from '../pages/CartPage'; 
 import CheckoutPage from '../pages/CheckoutPage';
 import AdminOrderDetailPage from '../pages/AdminOrderDetailPage';
 import AdminProducts from '../pages/AdminProducts';
 import AdminOrders from '../pages/AdminOrders';
+import ProfilePage from '../pages/ProfilePage';
+import UserProfile from '../pages/UserProfile';
+import UserOrders from '../pages/UserOrders';
+import UserFavorites from '../pages/UserFavorites';
 import Header from './Header';
 
 const Layout = () => {
@@ -50,19 +54,27 @@ const Layout = () => {
           <Route path="/" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage onLogin={() => setUser(jwtDecode(localStorage.getItem('token')))} />} />
           <Route
             path="/admin"
-            element={<ProtectedRoute><AdminPage /></ProtectedRoute>}
+            element={<AdminRoute><AdminPage /></AdminRoute>}
           >
             <Route index element={<AdminProducts />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
           </Route>
-          <Route path="/admin/orders/:id" element={<ProtectedRoute><AdminOrderDetailPage /></ProtectedRoute>} />
+          <Route
+            path="/profile"
+            element={<UserRoute><ProfilePage /></UserRoute>}
+          >
+            <Route index element={<UserProfile />} />
+            <Route path="me" element={<UserProfile />} />
+            <Route path="orders" element={<UserOrders />} />
+            <Route path="favorites" element={<UserFavorites />} />
+          </Route>
+          <Route path="/admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />
         </Routes>
       </main>
     </div>

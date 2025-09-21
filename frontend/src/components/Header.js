@@ -19,12 +19,18 @@ const Header = ({ user, onLogout }) => {
             </div>
             <div className={styles.navContainer}>
                 <Link to="/cart" className={styles.navLink}>
-                    Корзина ({cartCount})
+                    <i className="fas fa-shopping-cart"></i> ({cartCount})
                 </Link>
-                {user && (
-                    <Link to="/my-orders" className={styles.navLink}>Мои заказы</Link>
+                {user ? (
+                    <span className={styles.userActions}>
+                        <Link to="/profile" className={styles.navLink}>
+                            <i className="fas fa-user"></i> {user.username}
+                        </Link>
+                        <button onClick={onLogout} className={styles.logoutButton} title="Выйти"><i className="fas fa-sign-out-alt"></i></button>
+                    </span>
+                ) : (
+                    <Link to="/login" className={styles.navLink}>Войти</Link>
                 )}
-                {user ? (<span>Привет, {user.username}! <button onClick={onLogout} className={styles.logoutButton}>Выйти</button></span>) : (<Link to="/login" className={styles.navLink}>Войти</Link>)}
                 {user && user.role === 'admin' && (<Link to="/admin" className={styles.navLink}>Админ-панель</Link>)}
             </div>
         </header>

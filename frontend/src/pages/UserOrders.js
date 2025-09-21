@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const MyOrdersPage = () => {
+const UserOrders = () => {
     const [orders, setOrders] = useState([]);
     const [statusMap] = useState({
         pending: 'В ожидании',
@@ -51,7 +51,7 @@ const MyOrdersPage = () => {
 
     return (
         <div>
-            <h2>Мои заказы</h2>
+            <h3>Мои заказы</h3>
             {orders.length === 0 ? (
                 <p>У вас еще нет заказов.</p>
             ) : (
@@ -75,4 +75,4 @@ const MyOrdersPage = () => {
     );
 };
 
-export default MyOrdersPage;
+export default UserOrders;

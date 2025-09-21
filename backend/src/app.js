@@ -8,6 +8,7 @@ const productRoutes = require('./routes/productRoutes'); // Маршруты д�
 const authRoutes = require('./routes/authRoutes'); // Маршруты для аутентификации
 const categoryRoutes = require('./routes/categoryRoutes'); // Маршруты для категорий
 const orderRoutes = require('./routes/orderRoutes'); // Маршруты для заказов
+const favoriteRoutes = require('./routes/favoriteRoutes'); // Маршруты для избранного
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 const PORT = process.env.PORT || 5000;
 
