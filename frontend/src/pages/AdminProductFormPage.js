@@ -16,8 +16,8 @@ const AdminProductFormPage = () => {
         imageUrls: [],
         stock: '',
         categoryIds: [],
-        manufacturerIds: [],
-        materialIds: [],
+        manufacturerId: '', // Изменено с manufacturerIds
+        materialId: '',     // Изменено с materialIds
     });
     const [categories, setCategories] = useState([]);
     const [manufacturers, setManufacturers] = useState([]);
@@ -67,8 +67,8 @@ const AdminProductFormPage = () => {
                         imageUrls: product.imageUrls || [],
                         stock: product.stock,
                         categoryIds: product.Categories.map(cat => cat.id) || [],
-                        manufacturerIds: product.Manufacturers.map(m => m.id) || [],
-                        materialIds: product.Materials.map(m => m.id) || [],
+                        manufacturerId: product.Manufacturer ? product.Manufacturer.id : '', // Изменено
+                        materialId: product.Material ? product.Material.id : '',         // Изменено
                     });
                 } catch (err) {
                     setError(t('product_load_error'));
@@ -128,7 +128,7 @@ const AdminProductFormPage = () => {
         const productData = {
             ...formData,
             price: parseFloat(formData.price),
-            stock: parseInt(formData.stock, 10),
+            stock: parseInt(formData.stock, 10)
             // categoryIds уже является массивом чисел
         };
 
@@ -153,42 +153,34 @@ const AdminProductFormPage = () => {
             <Link to="/admin/products">{t('back_to_product_list')}</Link>
             <form onSubmit={handleSubmit} className={styles.form} style={{ marginTop: '1rem' }}>
                 <h3>{isEditing ? t('edit_product') : t('add_new_product')}</h3>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder={t('product_name')} required />
-                <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder={t('price')} required step="0.01" />
-                <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder={t('stock_quantity')} required />
+                <div className={styles.formGroup}>
+                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder={t('product_name')} required style={{ boxSizing: 'border-box' }} />
+                </div>
+                <div className={styles.formRow}>
+                    <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder={t('price')} required step="0.01" />
+                    <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder={t('stock_quantity')} required />
+                </div>
                 <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder={t('description')}></textarea>
-                <div className={styles.checkboxGroup}>
+                <div className={`${styles.checkboxGroup} ${styles.checkboxGroupHorizontal}`}>
                     <label>{t('categories')}</label>
                     <div className={styles.checkboxContainer}>
                         {categories.map(cat => (
-                            <label key={cat.id} className={styles.checkboxLabel}>
+                            <label key={cat.id} className={`${styles.checkboxLabel} ${styles.checkboxLabelHorizontal}`}>
                                 <input type="checkbox" checked={formData.categoryIds.includes(cat.id)} onChange={() => handleCheckboxChange('categoryIds', cat.id)} />
                                 {cat.name}
                             </label>
                         ))}
                     </div>
                 </div>
-                <div className={styles.checkboxGroup}>
-                    <label>{t('manufacturers')}</label>
-                    <div className={styles.checkboxContainer}>
-                        {manufacturers.map(man => (
-                            <label key={man.id} className={styles.checkboxLabel}>
-                                <input type="checkbox" checked={formData.manufacturerIds.includes(man.id)} onChange={() => handleCheckboxChange('manufacturerIds', man.id)} />
-                                {man.name}
-                            </label>
-                        ))}
-                    </div>
-                </div>
-                <div className={styles.checkboxGroup}>
-                    <label>{t('materials')}</label>
-                    <div className={styles.checkboxContainer}>
-                        {materials.map(mat => (
-                            <label key={mat.id} className={styles.checkboxLabel}>
-                                <input type="checkbox" checked={formData.materialIds.includes(mat.id)} onChange={() => handleCheckboxChange('materialIds', mat.id)} />
-                                {mat.name}
-                            </label>
-                        ))}
-                    </div>
+                <div className={styles.formRow}>
+                    <select name="manufacturerId" value={formData.manufacturerId} onChange={handleInputChange}>
+                        <option value="">{t('select_manufacturer')}</option>
+                        {manufacturers.map(man => (<option key={man.id} value={man.id}>{man.name}</option>))}
+                    </select>
+                    <select name="materialId" value={formData.materialId} onChange={handleInputChange}>
+                        <option value="">{t('select_material')}</option>
+                        {materials.map(mat => (<option key={mat.id} value={mat.id}>{mat.name}</option>))}
+                    </select>
                 </div>
                 <div className={styles.formGroup}>
                     <label>{t('product_images')}</label>

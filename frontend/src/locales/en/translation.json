@@ -143,6 +143,8 @@
     "search": "Search...",
     "security": "Security",
     "select_office": "Select an office",
+    "select_manufacturer": "Select manufacturer",
+    "select_material": "Select material",
     "select_rating_error": "Please select a rating.",
     "shopping_cart": "Shopping Cart",
     "show_password": "Show passwords",

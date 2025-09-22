@@ -144,6 +144,8 @@
     "security": "Сигурност",
     "select_office": "Изберете офис",
     "select_rating_error": "Моля, изберете оценка.",
+    "select_manufacturer": "Изберете производител",
+    "select_material": "Изберете материал",
     "shopping_cart": "Количка",
     "show_password": "Покажи паролите",
     "sort_name_asc": "Име: А-Я",

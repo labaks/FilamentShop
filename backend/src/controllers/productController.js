@@ -8,7 +8,7 @@ const { Op } = require('sequelize'); // Импортируем оператор�
 exports.getAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 8;
+    const limit = parseInt(req.query.limit, 10) || 9;
     const { search, categoryIds, manufacturerIds, materialIds, sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
     const offset = (page - 1) * limit;
 
@@ -28,37 +28,27 @@ exports.getAllProducts = async (req, res) => {
     const order = [[orderField, orderDirection]];
 
     const options = {
-      where,
       limit,
       offset,
       order,
-      include: []
+      include: [
+        { model: Category, attributes: ['id', 'name'] },
+        { model: Manufacturer, attributes: ['id', 'name'] },
+        { model: Material, attributes: ['id', 'name'] },
+      ]
     };
 
-    if (categoryIds) {
-      options.include.push({
-        model: Category,
-        where: { id: { [Op.in]: categoryIds.split(',') } },
-        attributes: [] // не включать данные категорий в основной результат
-      });
+    if (categoryIds) { // Фильтрация по категориям (многие ко многим)
+      where['$Categories.id$'] = { [Op.in]: categoryIds.split(',') };
     }
-
     if (manufacturerIds) {
-      options.include.push({
-        model: Manufacturer,
-        where: { id: { [Op.in]: manufacturerIds.split(',') } },
-        attributes: []
-      });
+      where.ManufacturerId = { [Op.in]: manufacturerIds.split(',') };
     }
-
     if (materialIds) {
-      options.include.push({
-        model: Material,
-        where: { id: { [Op.in]: materialIds.split(',') } },
-        attributes: []
-      });
+      where.MaterialId = { [Op.in]: materialIds.split(',') };
     }
 
+    options.where = where;
     const { count, rows } = await Product.findAndCountAll(options);
 
     res.json({
@@ -76,25 +66,24 @@ exports.getAllProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     // name, price, description, imageUrl, stock
-    const { name, price, description, imageUrls, stock, categoryIds, manufacturerIds, materialIds } = req.body;
+    const { name, price, description, imageUrls, stock, categoryIds, manufacturerId, materialId } = req.body;
 
     // Простая валидация
     if (!name || !price) {
       return res.status(400).json({ message: 'Поля "name" и "price" обязательны' });
     }
 
-    const newProduct = await Product.create({ name, price, description, imageUrls, stock });
+    const newProduct = await Product.create({ name, price, description, imageUrls, stock, manufacturerId, materialId });
 
     if (categoryIds && categoryIds.length > 0) {
       await newProduct.setCategories(categoryIds);
     }
 
-    if (manufacturerIds && manufacturerIds.length > 0) {
-      await newProduct.setManufacturers(manufacturerIds);
+    if (manufacturerId) {
+      await newProduct.setManufacturer(manufacturerId);
     }
-
-    if (materialIds && materialIds.length > 0) {
-      await newProduct.setMaterials(materialIds);
+    if (materialId) {
+      await newProduct.setMaterial(materialId);
     }
 
     res.status(201).json(newProduct);
@@ -136,19 +125,19 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Обновляем товар данными из тела запроса
-    const { categoryIds, manufacturerIds, materialIds, ...productData } = req.body;
+    const { categoryIds, manufacturerId, materialId, ...productData } = req.body;
     const updatedProduct = await product.update(productData);
 
     if (categoryIds) { // Позволяем передавать пустой массив для удаления всех категорий
       await updatedProduct.setCategories(categoryIds);
     }
 
-    if (manufacturerIds) {
-      await updatedProduct.setManufacturers(manufacturerIds);
+    if (manufacturerId !== undefined) { // Позволяем передавать null для удаления связи
+      await updatedProduct.setManufacturer(manufacturerId);
     }
 
-    if (materialIds) {
-      await updatedProduct.setMaterials(materialIds);
+    if (materialId !== undefined) { // Позволяем передавать null для удаления связи
+      await updatedProduct.setMaterial(materialId);
     }
 
     res.json(updatedProduct);
