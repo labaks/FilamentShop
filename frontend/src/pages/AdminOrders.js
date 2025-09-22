@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import styles from '../styles/AdminPage.module.css';
+import { toast } from 'react-toastify';
 
 const apiClient = axios.create({
     baseURL: 'http://localhost:5000/api',
@@ -44,7 +45,7 @@ const AdminOrders = () => {
             await apiClient.put(`/orders/${orderId}/status`, { status: newStatus });
             setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? { ...order, status: newStatus } : order));
         } catch (err) {
-            alert('Не удалось обновить статус заказа.');
+            toast.error('Не удалось обновить статус заказа.');
         }
     };
 

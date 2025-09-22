@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/apiClient';
 import { jwtDecode } from 'jwt-decode';
 import { CartContext } from '../context/CartContext';
+import { toast } from 'react-toastify';
 import styles from '../styles/AuthForm.module.css'; // Используем стили от форм для единообразия
 
 const CheckoutPage = () => {
@@ -48,7 +49,7 @@ const CheckoutPage = () => {
             const { name, email, phone, address } = response.data;
             setCustomerInfo({ name: name || '', email: email || '', phone: phone || '', address: address || '' });
         } catch (err) {
-            alert('Не удалось загрузить данные профиля.');
+            toast.error('Не удалось загрузить данные профиля.');
         }
     };
 
@@ -78,8 +79,8 @@ const CheckoutPage = () => {
 
         try {
             await apiClient.post('/orders', orderData);
+            toast.success('Ваш заказ успешно оформлен!');
             clearCart();
-            alert('Ваш заказ успешно оформлен!');
             navigate('/profile/orders');
         } catch (err) {
             setError(err.response?.data?.message || 'Не удалось оформить заказ. Попробуйте снова.');

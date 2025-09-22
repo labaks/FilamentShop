@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { CartContext } from '../context/CartContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import ProductPage from '../pages/ProductPage';
 import ProductListPage from '../pages/ProductListPage';
@@ -50,12 +52,13 @@ const Layout = () => {
     localStorage.removeItem('token');
     setUser(null);
     clearCart(); // Очищаем корзину при выходе
-    navigate('/login');
+    navigate('/');
   };
 
   return (
     <div className="App">
       <Header user={user} onLogout={handleLogout} />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <main style={{ padding: '20px' }}>
         <Routes>
           <Route path="/" element={<ProductListPage />} />

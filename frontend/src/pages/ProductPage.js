@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { CartContext } from '../context/CartContext';
 import { FavoriteContext } from '../context/FavoriteContext';
+import { toast } from 'react-toastify';
 import apiClient from '../api/apiClient';
 import Modal from '../components/Modal';
 import styles from '../styles/ProductPage.module.css';
@@ -115,7 +116,7 @@ const ProductPage = () => {
             const reviewsRes = await apiClient.get(`/reviews/${id}?page=${reviewsCurrentPage}&limit=5`);
             setReviews(reviewsRes.data.reviews);
         } catch (err) {
-            alert('Не удалось обновить отзыв.');
+            toast.error('Не удалось обновить отзыв.');
         }
     };
 
@@ -137,7 +138,7 @@ const ProductPage = () => {
             const reviewsRes = await apiClient.get(`/reviews/${id}?page=${reviewsCurrentPage}&limit=5`);
             setReviews(reviewsRes.data.reviews);
         } catch (err) {
-            alert('Не удалось удалить отзыв.');
+            toast.error('Не удалось удалить отзыв.');
         }
     };
 

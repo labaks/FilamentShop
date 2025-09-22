@@ -32,12 +32,24 @@
 }
 
 .navLink {
-    color: #61dafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 1rem;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 50px;
+    color: #282c34;
     text-decoration: none;
 }
 
 .navLink i {
     margin-right: 5px;
+}
+
+.cartCount {
+    font-weight: bold;
 }
 
 .userActions {
@@ -47,15 +59,22 @@
 }
 
 .logoutButton {
-    background: none;
-    color: #61dafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #282c34;
     border: none;
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    padding: 5px;
     cursor: pointer;
-    font-size: 1.2rem; /* Увеличим размер иконки */
+    font-size: 1.4rem; /* Увеличим размер иконки */
     padding: 0;
     line-height: 1; /* Для выравнивания */
 }
 
 .logoutButton:hover {
-    color: white;
+    color: #21a1f1;
 }

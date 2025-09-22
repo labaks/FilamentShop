@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api/apiClient';
+import { toast } from 'react-toastify';
+import Modal from '../components/Modal';
 import styles from '../styles/AdminPage.module.css';
 
 const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
@@ -9,6 +11,8 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
     const [newItemName, setNewItemName] = useState('');
     const [editingItemId, setEditingItemId] = useState(null);
     const [editingItemName, setEditingItemName] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const fetchItems = async () => {
         try {
@@ -34,7 +38,7 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
             setNewItemName('');
             await fetchItems();
         } catch (err) {
-            alert(`Ошибка при создании: ${err.response?.data?.message || err.message}`);
+            toast.error(`Ошибка при создании: ${err.response?.data?.message || err.message}`);
         }
     };
 
@@ -54,23 +58,33 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
             handleCancelEdit();
             await fetchItems();
         } catch (err) {
-            alert(`Ошибка при обновлении: ${err.response?.data?.message || err.message}`);
+            toast.error(`Ошибка при обновлении: ${err.response?.data?.message || err.message}`);
         }
     };
 
-    const handleDelete = async (id) => {
-        // Здесь мы можем использовать наше кастомное модальное окно,
-        // но для простоты пока оставим window.confirm,
-        // так как для интеграции модального окна потребуется больше изменений в этом универсальном компоненте.
-        if (window.confirm('Вы уверены, что хотите удалить этот элемент?')) {
-             try {
-                 await apiClient.delete(`${apiPath}/${id}`);
-                 await fetchItems();
-             } catch (err) {
-                 alert(`Ошибка при удалении: ${err.response?.data?.message || err.message}`);
-             }
-         }
+    const openDeleteModal = (item) => {
+        setItemToDelete(item);
+        setIsModalOpen(true);
     };
+
+    const closeDeleteModal = () => {
+        setItemToDelete(null);
+        setIsModalOpen(false);
+    };
+
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
+        try {
+            await apiClient.delete(`${apiPath}/${itemToDelete.id}`);
+            await fetchItems();
+            toast.success('Элемент успешно удален.');
+        } catch (err) {
+            toast.error(`Ошибка при удалении: ${err.response?.data?.message || err.message}`);
+        } finally {
+            closeDeleteModal();
+        }
+    };
+
 
     if (loading) return <div>Загрузка...</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
@@ -105,13 +119,24 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
                                 {editingItemId === item.id ? (
                                     <><button onClick={() => handleUpdate(item.id)}>Сохранить</button><button onClick={handleCancelEdit}>Отмена</button></>
                                 ) : (
-                                    <><button onClick={() => handleEditClick(item)} title="Редактировать"><i className="fas fa-pencil-alt"></i></button><button onClick={() => handleDelete(item.id)} className={styles.deleteButton} title="Удалить"><i className="fas fa-trash-alt"></i></button></>
+                                    <>
+                                        <button onClick={() => handleEditClick(item)} title="Редактировать"><i className="fas fa-pencil-alt"></i></button>
+                                        <button onClick={() => openDeleteModal(item)} className={styles.deleteButton} title="Удалить"><i className="fas fa-trash-alt"></i></button>
+                                    </>
                                 )}
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
+                title="Подтвердите удаление"
+            >
+                <p>Вы уверены, что хотите удалить элемент <strong>"{itemToDelete?.name}"</strong>?</p>
+            </Modal>
         </div>
     );
 };

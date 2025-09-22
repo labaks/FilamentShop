@@ -20,7 +20,8 @@ const Header = ({ user, onLogout }) => {
             <div className={styles.navContainer}>
                 {(user && user.role !== 'admin') && (
                     <Link to="/cart" className={styles.navLink}>
-                        <i className="fas fa-shopping-cart"></i> ({cartCount})
+                        <i className="fas fa-shopping-cart"></i>
+                        <span className={styles.cartCount}>({cartCount})</span>
                     </Link>
                 )}
                 {user ? (
