@@ -231,7 +231,7 @@ const ProductPage = () => {
                             {quantityInCart > 0 && (
                                 // Показываем счетчик, только если товар уже в корзине
                                     <div className={styles.quantitySelector}>
-                                        <button onClick={() => quantityInCart === 1 ? removeFromCart(product.id) : updateQuantity(product.id, quantityInCart - 1)}>-</button>
+                                        <button onClick={() => updateQuantity(product.id, quantityInCart - 1)}>-</button>
                                         <input type="number" value={quantityInCart} readOnly />
                                         <button onClick={() => updateQuantity(product.id, quantityInCart + 1)} disabled={quantityInCart >= product.stock}>+</button>
                                     </div>

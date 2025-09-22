@@ -1,0 +1,105 @@
+.ordersContainer {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ordersTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.ordersTable th, .ordersTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ordersTable th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+.orderRow {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.orderRow:hover {
+    background-color: #f8f9fa;
+}
+
+.orderRow td:last-child {
+    text-align: right;
+}
+
+.orderRow i {
+    transition: transform 0.3s ease;
+}
+
+.orderRow i.expanded {
+    transform: rotate(180deg);
+}
+
+.detailsRow td {
+    padding: 0;
+    background-color: #fdfdfd;
+}
+
+.orderDetails {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.orderItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.orderItem img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.itemInfo {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.itemInfo a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.itemInfo a:hover {
+    text-decoration: underline;
+}
+
+.itemInfo span {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.pending { background-color: #ffc107; color: #212529; }
+.processing { background-color: #17a2b8; }
+.shipped { background-color: #007bff; }
+.delivered { background-color: #28a745; }
+.cancelled { background-color: #6c757d; }

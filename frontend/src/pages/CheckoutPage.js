@@ -10,7 +10,8 @@ const CheckoutPage = () => {
     const { cartItems, cartTotal, clearCart } = useContext(CartContext);
     const navigate = useNavigate();
     const [customerInfo, setCustomerInfo] = useState({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
         address: '',
@@ -26,9 +27,11 @@ const CheckoutPage = () => {
             if (localStorage.getItem('token')) {
                 try {
                     const response = await apiClient.get('/auth/profile');
-                    const { name, email, phone, address } = response.data;
-                    if (name || email || phone || address) {
+                    const { firstName, lastName, email, phone, address, preferredDeliveryMethod, preferredDeliveryType } = response.data;
+                    if (firstName || lastName || email || phone || address) {
                         setProfileDataExists(true);
+                        setDeliveryMethod(preferredDeliveryMethod || '');
+                        setDeliveryType(preferredDeliveryType || '');
                     }
                 } catch (err) {
                     console.error("Could not check profile data", err);
@@ -46,8 +49,10 @@ const CheckoutPage = () => {
     const handleFillFromProfile = async () => {
         try {
             const response = await apiClient.get('/auth/profile');
-            const { name, email, phone, address } = response.data;
-            setCustomerInfo({ name: name || '', email: email || '', phone: phone || '', address: address || '' });
+            const { firstName, lastName, email, phone, address, preferredDeliveryMethod, preferredDeliveryType } = response.data;
+            setCustomerInfo({ firstName: firstName || '', lastName: lastName || '', email: email || '', phone: phone || '', address: address || '' });
+            setDeliveryMethod(preferredDeliveryMethod || '');
+            setDeliveryType(preferredDeliveryType || '');
         } catch (err) {
             toast.error('Не удалось загрузить данные профиля.');
         }
@@ -105,8 +110,16 @@ const CheckoutPage = () => {
                 )}
                 <h4>Контактная информация</h4>
                 <div className={styles.formGroup}>
-                    <label>Имя</label>
-                    <input type="text" name="name" value={customerInfo.name} onChange={handleInputChange} required />
+                    <div className={styles.row}>
+                        <div className={styles.formGroup}>
+                            <label>Имя</label>
+                            <input type="text" name="firstName" value={customerInfo.firstName} onChange={handleInputChange} required />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Фамилия</label>
+                            <input type="text" name="lastName" value={customerInfo.lastName} onChange={handleInputChange} required />
+                        </div>
+                    </div>
                 </div>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>

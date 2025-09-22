@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import styles from '../styles/UserOrders.module.css';
 
 const UserOrders = () => {
     const [orders, setOrders] = useState([]);
     const [statusMap] = useState({
+        // Добавим стили для каждого статуса
         pending: 'В ожидании',
         processing: 'В обработке',
         shipped: 'Отправлен',
@@ -13,6 +16,7 @@ const UserOrders = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [expandedOrderId, setExpandedOrderId] = useState(null);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -49,27 +53,60 @@ const UserOrders = () => {
         return <div style={{ color: 'red' }}>{error}</div>;
     }
 
+    const toggleOrderDetails = (orderId) => {
+        setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+    };
+
     return (
-        <div>
+        <div className={styles.ordersContainer}>
             <h3>Мои заказы</h3>
             {orders.length === 0 ? (
                 <p>У вас еще нет заказов.</p>
             ) : (
-                orders.map(order => (
-                    <div key={order.id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                        <h4>Заказ №{order.id} от {new Date(order.createdAt).toLocaleDateString()}</h4>
-                        <p><strong>Статус:</strong> {statusMap[order.status] || order.status}</p>
-                        <p><strong>Общая сумма:</strong> {order.totalAmount} лв.</p>
-                        <h5>Товары в заказе:</h5>
-                        <ul>
-                            {order.OrderItems.map(item => (
-                                <li key={item.id}>
-                                    {item.Product.name} - {item.quantity} шт. x {item.price} лв.
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))
+                <table className={styles.ordersTable}>
+                    <thead>
+                        <tr>
+                            <th>Номер заказа</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Сумма</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map(order => (
+                            <React.Fragment key={order.id}>
+                                <tr onClick={() => toggleOrderDetails(order.id)} className={styles.orderRow}>
+                                    <td>#{order.id}</td>
+                                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                    <td><span className={`${styles.status} ${styles[order.status]}`}>{statusMap[order.status] || order.status}</span></td>
+                                    <td>{order.totalAmount} лв.</td>
+                                    <td><i className={`fas fa-chevron-down ${expandedOrderId === order.id ? styles.expanded : ''}`}></i></td>
+                                </tr>
+                                {expandedOrderId === order.id && (
+                                    <tr className={styles.detailsRow}>
+                                        <td colSpan="5">
+                                            <div className={styles.orderDetails}>
+                                                {order.OrderItems.map(item => (
+                                                    <div key={item.id} className={styles.orderItem}>
+                                                        <Link to={`/products/${item.productId}`}>
+                                                            <img src={item.Product.imageUrls && item.Product.imageUrls.length > 0 ? `http://localhost:5000${item.Product.imageUrls[0]}` : 'https://via.placeholder.com/60'} alt={item.Product.name} />
+                                                        </Link>
+                                                        <div className={styles.itemInfo}>
+                                                            <Link to={`/products/${item.productId}`}>{item.Product.name}</Link>
+                                                            <span>{item.quantity} шт. x {item.price} лв.</span>
+                                                        </div>
+                                                        <strong>{(item.quantity * item.price).toFixed(2)} лв.</strong>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
             )}
         </div>
     );

@@ -82,7 +82,7 @@ exports.getUserProfile = async (req, res) => {
     try {
         const userId = req.user.id;
         const user = await User.findByPk(userId, {
-            attributes: ['id', 'username', 'name', 'email', 'phone', 'address']
+            attributes: ['id', 'username', 'firstName', 'lastName', 'email', 'phone', 'address', 'preferredDeliveryMethod', 'preferredDeliveryType']
         });
         if (!user) {
             return res.status(404).json({ message: 'Пользователь не найден.' });
@@ -96,12 +96,12 @@ exports.getUserProfile = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { name, email, phone, address } = req.body;
+        const { firstName, lastName, email, phone, address, preferredDeliveryMethod, preferredDeliveryType } = req.body;
         const user = await User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: 'Пользователь не найден.' });
         }
-        await user.update({ name, email, phone, address });
+        await user.update({ firstName, lastName, email, phone, address, preferredDeliveryMethod, preferredDeliveryType });
         res.json({ message: 'Профиль успешно обновлен.' });
     } catch (error) {
         res.status(500).json({ message: 'Ошибка сервера при обновлении профиля.' });
