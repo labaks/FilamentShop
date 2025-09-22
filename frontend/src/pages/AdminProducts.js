@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/apiClient';
 import Modal from '../components/Modal';
 import styles from '../styles/AdminPage.module.css';
+import { useTranslation } from 'react-i18next';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -10,23 +11,24 @@ const AdminProducts = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
+    const { t } = useTranslation();
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
             const response = await apiClient.get('/products?limit=100'); // Загружаем больше товаров
             setProducts(response.data.products || []);
         } catch (err) {
-            setError('Не удалось загрузить товары.');
+            setError(t('product_load_error'));
             console.error(err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const openDeleteModal = (product) => {
         setProductToDelete(product);
@@ -44,35 +46,35 @@ const AdminProducts = () => {
             closeDeleteModal();
             await fetchProducts();
         } catch (err) {
-            setError('Ошибка при удалении товара.');
+            setError(t('product_delete_error'));
             console.error(err);
         }
     };
 
-    if (loading) return <div>Загрузка товаров...</div>;
+    if (loading) return <div>{t('loading')}</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2>Список товаров</h2>
+                <h2>{t('product_list')}</h2>
                 <Link to="/admin/products/new" className={styles.submitButton} style={{ textDecoration: 'none' }}>
-                    Добавить товар
+                    {t('add_product')}
                 </Link>
             </div>
             <table className={styles.table}>
                 <thead>
-                    <tr><th>ID</th><th>Название</th><th>Цена</th><th>На складе</th><th>Действия</th></tr>
+                    <tr><th>ID</th><th>{t('name')}</th><th>{t('price')}</th><th>{t('stock')}</th><th>{t('actions')}</th></tr>
                 </thead>
                 <tbody>
                     {products.map((product) => (
                         <tr key={product.id}>
                             <td>{product.id}</td><td>{product.name}</td><td>{product.price}</td><td>{product.stock}</td>
                             <td className={styles.actions}>
-                                <Link to={`/admin/products/${product.id}`} title="Редактировать">
+                                <Link to={`/admin/products/${product.id}`} title={t('edit')}>
                                     <i className="fas fa-pencil-alt"></i>
                                 </Link>
-                                <button onClick={() => openDeleteModal(product)} className={styles.deleteButton} title="Удалить"><i className="fas fa-trash-alt"></i></button>
+                                <button onClick={() => openDeleteModal(product)} className={styles.deleteButton} title={t('delete')}><i className="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                     ))}
@@ -82,9 +84,9 @@ const AdminProducts = () => {
                 isOpen={isModalOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                title="Подтвердите удаление товара"
+                title={t('confirm_delete_product')}
             >
-                <p>Вы уверены, что хотите удалить товар <strong>"{productToDelete?.name}"</strong>?</p>
+                <p>{t('confirm_delete_product_item', { name: productToDelete?.name })}</p>
             </Modal>
         </>
     );

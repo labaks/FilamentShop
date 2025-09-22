@@ -1,9 +1,11 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/apiClient';
+import { useTranslation } from 'react-i18next';
 
 export const FavoriteContext = createContext();
 
 export const FavoriteProvider = ({ children }) => {
+    const { t } = useTranslation();
     const [favoriteIds, setFavoriteIds] = useState(new Set());
 
     const fetchFavorites = useCallback(async () => {
@@ -28,7 +30,7 @@ export const FavoriteProvider = ({ children }) => {
     const toggleFavorite = async (productId) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            alert('Пожалуйста, войдите в систему, чтобы добавлять товары в избранное.');
+            alert(t('add_to_favorites_login_prompt'));
             return;
         }
         

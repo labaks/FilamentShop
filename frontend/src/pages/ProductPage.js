@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import apiClient from '../api/apiClient';
 import Modal from '../components/Modal';
 import styles from '../styles/ProductPage.module.css';
+import { useTranslation } from 'react-i18next';
 
 const ProductPage = () => {
     const { id } = useParams(); // Получаем id товара из URL
@@ -23,9 +24,9 @@ const ProductPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState(null);
     const [error, setError] = useState(null);
-    const [reviewError, setReviewError] = useState('');
-    const { cartItems, addToCart, updateQuantity, removeFromCart } = useContext(CartContext);
+    const [reviewError, setReviewError] = useState('');    const { cartItems, addToCart, updateQuantity } = useContext(CartContext);
     const { favoriteIds, toggleFavorite } = useContext(FavoriteContext);
+    const { t } = useTranslation();
 
     const [currentUser, setCurrentUser] = useState(null);
 
@@ -54,9 +55,9 @@ const ProductPage = () => {
                 setReviewsTotalPages(reviewsRes.data.totalPages);
             } catch (err) {
                 if (err.response && err.response.status === 404) {
-                    setError('Товар не найден.');
+                    setError(t('products_not_found')); // Reusing key
                 } else {
-                    setError('Ошибка при загрузке данных.');
+                    setError(t('loading_data_error')); // Reusing key
                 }
                 console.error(err);
             } finally {
@@ -65,7 +66,7 @@ const ProductPage = () => {
         };
 
         fetchProductAndReviews(reviewsCurrentPage);
-    }, [id, reviewsCurrentPage]);
+    }, [id, reviewsCurrentPage, t]);
 
     const handleReviewsPageChange = (newPage) => {
         setReviewsCurrentPage(newPage);
@@ -76,11 +77,11 @@ const ProductPage = () => {
         setReviewError('');
         const token = localStorage.getItem('token');
         if (!token) {
-            setReviewError('Только авторизованные пользователи могут оставлять отзывы.');
+            setReviewError(t('auth_to_review_error'));
             return;
         }
         if (reviewData.rating === 0) {
-            setReviewError('Пожалуйста, выберите оценку.');
+            setReviewError(t('select_rating_error'));
             return;
         }
 
@@ -93,7 +94,7 @@ const ProductPage = () => {
             setReviewsTotalPages(reviewsRes.data.totalPages);
             setReviewData({ rating: 0, comment: '' }); // Сбрасываем форму
         } catch (err) {
-            setReviewError(err.response?.data?.message || 'Не удалось отправить отзыв.');
+            setReviewError(err.response?.data?.message || t('review_submit_fail'));
         }
     };
 
@@ -116,7 +117,7 @@ const ProductPage = () => {
             const reviewsRes = await apiClient.get(`/reviews/${id}?page=${reviewsCurrentPage}&limit=5`);
             setReviews(reviewsRes.data.reviews);
         } catch (err) {
-            toast.error('Не удалось обновить отзыв.');
+            toast.error(t('review_update_fail'));
         }
     };
 
@@ -138,7 +139,7 @@ const ProductPage = () => {
             const reviewsRes = await apiClient.get(`/reviews/${id}?page=${reviewsCurrentPage}&limit=5`);
             setReviews(reviewsRes.data.reviews);
         } catch (err) {
-            toast.error('Не удалось удалить отзыв.');
+            toast.error(t('review_delete_fail'));
         }
     };
 
@@ -151,7 +152,7 @@ const ProductPage = () => {
     };
 
     if (loading) {
-        return <div>Загрузка...</div>;
+        return <div>{t('loading')}</div>;
     }
 
     if (error) {
@@ -159,7 +160,7 @@ const ProductPage = () => {
     }
 
     if (!product) {
-        return null; // Или можно показать сообщение, что товар не найден
+        return null; // Or show a "not found" message
     }
 
     const isFavorite = favoriteIds.has(product.id);
@@ -169,7 +170,7 @@ const ProductPage = () => {
     return (
         <div className={styles.pageContainer}>
             <div className={styles.backLinkContainer}>
-                <Link to="/" className={styles.backLink}>← Назад в каталог</Link>
+                <Link to="/" className={styles.backLink}>{t('back_to_catalog')}</Link>
             </div>
             <div className={styles.gridContainer}>
                 <div className={styles.imageContainer}>
@@ -195,34 +196,34 @@ const ProductPage = () => {
                     {product.reviewCount > 0 && (
                         <div className={styles.ratingSummary}>
                             {renderStars(product.averageRating)}
-                            <span style={{ marginLeft: '10px' }}>{product.averageRating} ({product.reviewCount} отзывов)</span>
+                            <span style={{ marginLeft: '10px' }}>{product.averageRating} {t('reviews_count', { count: product.reviewCount })}</span>
                         </div>
                     )}
 
                     {product.Categories && product.Categories.length > 0 && (
                         <div className={styles.categories}>
-                            <strong>Категории:</strong>
+                            <strong>{t('categories')}:</strong>
                             {product.Categories.map(cat => <span key={cat.id} className={styles.categoryTag}>{cat.name}</span>)}
                         </div>
                     )}
                     {product.Manufacturers && product.Manufacturers.length > 0 && (
                         <div className={styles.categories}>
-                            <strong>Производители:</strong>
+                            <strong>{t('manufacturers')}:</strong>
                             {product.Manufacturers.map(man => <span key={man.id} className={styles.categoryTag}>{man.name}</span>)}
                         </div>
                     )}
                     {product.Materials && product.Materials.length > 0 && (
                         <div className={styles.categories}>
-                            <strong>Материалы:</strong>
+                            <strong>{t('materials')}:</strong>
                             {product.Materials.map(mat => <span key={mat.id} className={styles.categoryTag}>{mat.name}</span>)}
                         </div>
                     )}
 
-                    <p className={styles.price}>{product.price} лв.</p>
+                    <p className={styles.price}>{product.price} {t('lv')}</p>
                     <p className={styles.stock}>
-                        <strong>В наличии: </strong>
+                        <strong>{t('in_stock')}: </strong>
                         <span className={product.stock > 0 ? styles.stockAvailable : styles.stockUnavailable}>
-                            {product.stock > 0 ? `${product.stock} шт.` : 'Нет в наличии'}
+                            {product.stock > 0 ? `${product.stock} ${t('pcs')}` : t('out_of_stock')}
                         </span>
                     </p>
                     <p className={styles.description}>{product.description}</p>
@@ -237,7 +238,7 @@ const ProductPage = () => {
                                     </div>
                             )}
                             <button onClick={() => addToCart(product, 1)} disabled={product.stock === 0 || quantityInCart >= product.stock} className={styles.addToCartButton}>
-                                Добавить в корзину <i className="fas fa-plus" style={{ marginLeft: '10px' }}></i>
+                                {t('add_to_cart')} <i className="fas fa-plus" style={{ marginLeft: '10px' }}></i>
                             </button>
                         </div>
                     )}
@@ -245,7 +246,7 @@ const ProductPage = () => {
             </div>
 
             <div className={styles.reviewsSection}>
-                <h3>Отзывы ({reviews.length})</h3>
+                <h3>{t('reviews')} ({reviews.length})</h3>
                 {reviews.length > 0 ? (
                     reviews.map(review => (
                         <div key={review.id} className={styles.review} >
@@ -259,8 +260,8 @@ const ProductPage = () => {
                                         })}
                                     </div>
                                     <textarea rows="3" value={editingReview.comment} onChange={(e) => setEditingReview({ ...editingReview, comment: e.target.value })}></textarea>
-                                    <button onClick={handleUpdateReview} className={styles.addToCartButton}>Сохранить</button>
-                                    <button onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>Отмена</button>
+                                    <button onClick={handleUpdateReview} className={styles.addToCartButton}>{t('save')}</button>
+                                    <button onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>{t('cancel')}</button>
                                 </div>
                             ) : (
                                 // Отображение отзыва
@@ -273,10 +274,10 @@ const ProductPage = () => {
                                     <small>{new Date(review.createdAt).toLocaleDateString()}</small>
                                     {currentUser && (currentUser.id === review.userId || currentUser.role === 'admin') && (
                                         <div className={styles.reviewActions}>
-                                            <button onClick={() => handleEditClick(review)} title="Редактировать">
+                                            <button onClick={() => handleEditClick(review)} title={t('edit')}>
                                                 <i className="fas fa-pencil-alt"></i>
                                             </button>
-                                            <button onClick={() => openDeleteModal(review)} title="Удалить" style={{ color: '#dc3545' }}>
+                                            <button onClick={() => openDeleteModal(review)} title={t('delete')} style={{ color: '#dc3545' }}>
                                                 <i className="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -286,23 +287,23 @@ const ProductPage = () => {
                         </div>
                     ))
                 ) : (
-                    <p>Отзывов пока нет. Будьте первым!</p>
+                    <p>{t('no_reviews_yet')}</p>
                 )}
 
                 {reviewsTotalPages > 1 && (
                     <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '10px' }}>
                         <button onClick={() => handleReviewsPageChange(reviewsCurrentPage - 1)} disabled={reviewsCurrentPage === 1}>
-                            Назад
+                            {t('previous')}
                         </button>
-                        <span>Страница {reviewsCurrentPage} из {reviewsTotalPages}</span>
+                        <span>{t('page')} {reviewsCurrentPage} {t('of')} {reviewsTotalPages}</span>
                         <button onClick={() => handleReviewsPageChange(reviewsCurrentPage + 1)} disabled={reviewsCurrentPage === reviewsTotalPages}>
-                            Вперед
+                            {t('next')}
                         </button>
                     </div>
                 )}
 
                 <form onSubmit={handleReviewSubmit} className={styles.reviewForm}>
-                    <h4>Оставить отзыв</h4>
+                    <h4>{t('leave_review')}</h4>
                     <div className={styles.starRatingInput}>
                         {[...Array(5)].map((_, index) => {
                             const ratingValue = index + 1;
@@ -316,14 +317,14 @@ const ProductPage = () => {
                     </div>
                     <textarea
                         rows="4"
-                        placeholder="Ваш комментарий..."
+                        placeholder={t('your_comment')}
                         value={reviewData.comment}
                         onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
                     ></textarea>
                     {reviewError && <p style={{ color: 'red' }}>{reviewError}</p>}
                     <div className={styles.formActions}>
                         <button type="submit" className={styles.addToCartButton} style={{ backgroundColor: '#007bff' }}>
-                            <i className="fas fa-paper-plane" style={{ marginRight: '10px' }}></i> Отправить отзыв
+                            <i className="fas fa-paper-plane" style={{ marginRight: '10px' }}></i> {t('submit_review')}
                         </button>
                     </div>
                 </form>
@@ -331,10 +332,9 @@ const ProductPage = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeDeleteModal}
-                onConfirm={confirmDeleteReview}
-                title="Подтвердите удаление отзыва"
+                onConfirm={confirmDeleteReview}                title={t('confirm_review_delete')}
             >
-                <p>Вы уверены, что хотите удалить этот отзыв?</p>
+                <p>{t('are_you_sure_delete_review')}</p>
                 {reviewToDelete?.comment && <p><em>"{reviewToDelete.comment}"</em></p>}
             </Modal>
         </div>

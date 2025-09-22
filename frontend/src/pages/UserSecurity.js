@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import apiClient from '../api/apiClient';
 import styles from '../styles/AuthForm.module.css';
+import { useTranslation } from 'react-i18next';
 
 const UserSecurity = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -9,6 +10,7 @@ const UserSecurity = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showPasswords, setShowPasswords] = useState(false);
+    const { t } = useTranslation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,30 +18,30 @@ const UserSecurity = () => {
         setSuccess('');
 
         if (newPassword !== confirmPassword) {
-            setError('Новые пароли не совпадают.');
+            setError(t('passwords_do_not_match'));
             return;
         }
 
         try {
-            const response = await apiClient.post('/auth/change-password', {
+            await apiClient.post('/auth/change-password', {
                 currentPassword,
                 newPassword,
             });
-            setSuccess(response.data.message);
+            setSuccess(t('password_change_success'));
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
         } catch (err) {
-            setError(err.response?.data?.message || 'Не удалось изменить пароль.');
+            setError(err.response?.data?.message || t('password_change_fail'));
         }
     };
 
     return (
         <div>
-            <h3>Смена пароля</h3>
+            <h3>{t('change_password')}</h3>
             <form onSubmit={handleSubmit} className={styles.formContainer} style={{ margin: '0', maxWidth: '500px' }}>
                 <div className={styles.formGroup}>
-                    <label>Текущий пароль</label>
+                    <label>{t('current_password')}</label>
                     <div className={styles.passwordInputContainer}>
                         <input type={showPasswords ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
                         <i
@@ -49,7 +51,7 @@ const UserSecurity = () => {
                     </div>
                 </div>
                 <div className={styles.formGroup}>
-                    <label>Новый пароль</label>
+                    <label>{t('new_password')}</label>
                     <div className={styles.passwordInputContainer}>
                         <input type={showPasswords ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
                         <i
@@ -59,20 +61,20 @@ const UserSecurity = () => {
                     </div>
                 </div>
                 <div className={styles.formGroup}>
-                    <label>Подтвердите новый пароль</label>
+                    <label>{t('confirm_new_password')}</label>
                     <div className={styles.passwordInputContainer}>
                         <input type={showPasswords ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                         <i
                             className={`fas ${showPasswords ? 'fa-eye-slash' : 'fa-eye'} ${styles.passwordToggleIcon}`} 
                             onClick={() => setShowPasswords(!showPasswords)}
-                            title={showPasswords ? 'Скрыть пароли' : 'Показать пароли'}
+                            title={showPasswords ? t('hide_password') : t('show_password')}
                         ></i>
                     </div>
                 </div>
                 {error && <p className={styles.errorMessage}>{error}</p>}
                 {success && <p className={styles.successMessage}>{success}</p>}
                 <button type="submit" className={styles.formButton}>
-                    Изменить пароль
+                    {t('change_password')}
                 </button>
             </form>
         </div>

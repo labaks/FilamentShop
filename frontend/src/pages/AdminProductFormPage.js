@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/apiClient';
 import styles from '../styles/AdminPage.module.css';
+import { useTranslation } from 'react-i18next';
 
 const AdminProductFormPage = () => {
     const { id } = useParams();
@@ -23,6 +24,7 @@ const AdminProductFormPage = () => {
     const [materials, setMaterials] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -30,7 +32,7 @@ const AdminProductFormPage = () => {
                 const response = await apiClient.get('/categories');
                 setCategories(response.data);
             } catch (err) {
-                console.error('Не удалось загрузить категории', err);
+                console.error('Failed to load categories', err);
             }
         };
 
@@ -39,7 +41,7 @@ const AdminProductFormPage = () => {
                 const response = await apiClient.get('/manufacturers');
                 setManufacturers(response.data);
             } catch (err) {
-                console.error('Не удалось загрузить производителей', err);
+                console.error('Failed to load manufacturers', err);
             }
         };
 
@@ -48,7 +50,7 @@ const AdminProductFormPage = () => {
                 const response = await apiClient.get('/materials');
                 setMaterials(response.data);
             } catch (err) {
-                console.error('Не удалось загрузить материалы', err);
+                console.error('Failed to load materials', err);
             }
         };
 
@@ -69,7 +71,7 @@ const AdminProductFormPage = () => {
                         materialIds: product.Materials.map(m => m.id) || [],
                     });
                 } catch (err) {
-                    setError('Не удалось загрузить данные товара.');
+                    setError(t('product_load_error'));
                 } finally {
                     setLoading(false);
                 }
@@ -80,7 +82,7 @@ const AdminProductFormPage = () => {
         fetchManufacturers();
         fetchMaterials();
         fetchProduct();
-    }, [id, isEditing]);
+    }, [id, isEditing, t]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -100,7 +102,7 @@ const AdminProductFormPage = () => {
             const response = await apiClient.post('/upload', uploadFormData);
             setFormData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ...response.data.imageUrls] }));
         } catch (err) {
-            setError('Ошибка при загрузке изображения.');
+            setError(t('image_upload_error'));
         }
     };
 
@@ -138,25 +140,25 @@ const AdminProductFormPage = () => {
             }
             navigate('/admin/products');
         } catch (err) {
-            setError('Ошибка при сохранении товара.');
+            setError(t('product_save_error'));
             console.error(err);
         }
     };
 
-    if (loading) return <div>Загрузка...</div>;
+    if (loading) return <div>{t('loading')}</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
         <div>
-            <Link to="/admin/products">← Назад к списку товаров</Link>
+            <Link to="/admin/products">{t('back_to_product_list')}</Link>
             <form onSubmit={handleSubmit} className={styles.form} style={{ marginTop: '1rem' }}>
-                <h3>{isEditing ? 'Редактировать товар' : 'Добавить новый товар'}</h3>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Название товара" required />
-                <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="Цена" required step="0.01" />
-                <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder="Количество на складе" required />
-                <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Описание"></textarea>
+                <h3>{isEditing ? t('edit_product') : t('add_new_product')}</h3>
+                <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder={t('product_name')} required />
+                <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder={t('price')} required step="0.01" />
+                <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder={t('stock_quantity')} required />
+                <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder={t('description')}></textarea>
                 <div className={styles.checkboxGroup}>
-                    <label>Категории</label>
+                    <label>{t('categories')}</label>
                     <div className={styles.checkboxContainer}>
                         {categories.map(cat => (
                             <label key={cat.id} className={styles.checkboxLabel}>
@@ -167,7 +169,7 @@ const AdminProductFormPage = () => {
                     </div>
                 </div>
                 <div className={styles.checkboxGroup}>
-                    <label>Производители</label>
+                    <label>{t('manufacturers')}</label>
                     <div className={styles.checkboxContainer}>
                         {manufacturers.map(man => (
                             <label key={man.id} className={styles.checkboxLabel}>
@@ -178,7 +180,7 @@ const AdminProductFormPage = () => {
                     </div>
                 </div>
                 <div className={styles.checkboxGroup}>
-                    <label>Материалы</label>
+                    <label>{t('materials')}</label>
                     <div className={styles.checkboxContainer}>
                         {materials.map(mat => (
                             <label key={mat.id} className={styles.checkboxLabel}>
@@ -189,14 +191,14 @@ const AdminProductFormPage = () => {
                     </div>
                 </div>
                 <div className={styles.formGroup}>
-                    <label>Изображение товара</label>
+                    <label>{t('product_images')}</label>
                     <input type="file" onChange={handleImageUpload} multiple />
                     <div className={styles.imagePreviewContainer}>
                         {formData.imageUrls.map((url, index) => (
                             <div key={index} className={styles.imagePreviewWrapper}>
                                 <img 
                                     src={`http://localhost:5000${url}`} 
-                                    alt={`Предпросмотр ${index + 1}`} 
+                                    alt={`Preview ${index + 1}`} 
                                     className={styles.imagePreview}
                                 />
                                 <button type="button" onClick={() => handleRemoveImage(url)} className={styles.removeImageButton}>
@@ -207,7 +209,7 @@ const AdminProductFormPage = () => {
                     </div>
                 </div>
                 <div>
-                    <button type="submit" className={styles.submitButton}>{isEditing ? 'Сохранить изменения' : 'Добавить товар'}</button>
+                    <button type="submit" className={styles.submitButton}>{isEditing ? t('save_changes') : t('add_product')}</button>
                 </div>
             </form>
         </div>

@@ -4,12 +4,14 @@ import { FavoriteContext } from '../context/FavoriteContext';
 import cardStyles from '../styles/ProductCard.module.css'; // Стили для карточки товара
 import pageStyles from '../styles/ProductListPage.module.css'; // Стили для страницы каталога
 import apiClient from '../api/apiClient';
+import { useTranslation } from 'react-i18next';
 
 const ProductListPage = () => {
     const { favoriteIds, toggleFavorite } = useContext(FavoriteContext);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { t } = useTranslation();
 
     // Состояния для пагинации и фильтров
     const [currentPage, setCurrentPage] = useState(1);
@@ -57,7 +59,7 @@ const ProductListPage = () => {
                 setTotalPages(response.data.totalPages);
             } catch (err) {
                 if (err.name !== 'CanceledError') { // Не показываем ошибку, если запрос был отменен
-                    setError('Не удалось загрузить товары. Попробуйте позже.');
+                    setError(t('product_load_error_generic'));
                     console.error(err);
                 }
             } finally {
@@ -79,7 +81,7 @@ const ProductListPage = () => {
                     materials: materialsRes.data
                 });
             } catch (err) {
-                console.error('Не удалось загрузить опции для фильтров', err);
+                console.error(t('filter_options_load_error'), err);
             }
         };
 
@@ -95,10 +97,10 @@ const ProductListPage = () => {
             clearTimeout(handler);
             controller.abort();
         };
-    }, [currentPage, searchTerm, sortOption, selectedFilters]);
+    }, [currentPage, searchTerm, sortOption, selectedFilters, isInitialLoad, t]);
 
     if (loading) {
-        return <div>Загрузка товаров...</div>;
+        return <div>{t('loading_products')}</div>;
     }
 
     if (error) {
@@ -136,9 +138,9 @@ const ProductListPage = () => {
     return (
         <div className={pageStyles.pageContainer}>
             <aside className={pageStyles.filters}>
-                <h4>Фильтры</h4>
+                <h4>{t('filters')}</h4>
                 <div className={pageStyles.filterGroup}>
-                    <h4>Категории</h4>
+                    <h4>{t('categories')}</h4>
                     <div className={pageStyles.checkboxContainer}>
                         {filterOptions.categories.map(cat => (
                             <label key={cat.id} className={pageStyles.checkboxLabel}>
@@ -149,7 +151,7 @@ const ProductListPage = () => {
                     </div>
                 </div>
                 <div className={pageStyles.filterGroup}>
-                    <h4>Производители</h4>
+                    <h4>{t('manufacturers')}</h4>
                     <div className={pageStyles.checkboxContainer}>
                         {filterOptions.manufacturers.map(man => (
                             <label key={man.id} className={pageStyles.checkboxLabel}>
@@ -160,7 +162,7 @@ const ProductListPage = () => {
                     </div>
                 </div>
                 <div className={pageStyles.filterGroup}>
-                    <h4>Материалы</h4>
+                    <h4>{t('materials')}</h4>
                     <div className={pageStyles.checkboxContainer}>
                         {filterOptions.materials.map(mat => (
                             <label key={mat.id} className={pageStyles.checkboxLabel}>
@@ -174,27 +176,27 @@ const ProductListPage = () => {
 
             <div className={pageStyles.content}>
                 <div className={pageStyles.topBar}>
-                    <h2>Каталог товаров</h2>
+                    <h2>{t('product_catalog')}</h2>
                     <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                         <input
                             type="text"
-                            placeholder="Поиск..."
+                            placeholder={t('search')}
                             value={searchTerm}
                             onChange={handleSearchChange}
                             style={{ padding: '0.5rem', fontSize: '1rem' }}
                         />
                         <select value={sortOption} onChange={handleSortChange} style={{ padding: '0.5rem', fontSize: '1rem' }}>
-                            <option value="createdAt-DESC">Сначала новые</option>
-                            <option value="price-ASC">Цена: по возрастанию</option>
-                            <option value="price-DESC">Цена: по убыванию</option>
-                            <option value="name-ASC">Название: А-Я</option>
-                            <option value="name-DESC">Название: Я-А</option>
+                            <option value="createdAt-DESC">{t('sort_newest')}</option>
+                            <option value="price-ASC">{t('sort_price_asc')}</option>
+                            <option value="price-DESC">{t('sort_price_desc')}</option>
+                            <option value="name-ASC">{t('sort_name_asc')}</option>
+                            <option value="name-DESC">{t('sort_name_desc')}</option>
                         </select>
                     </div>
                 </div>
 
                 {products.length === 0 ? (
-                    <p>Товары, соответствующие вашему запросу, не найдены.</p>
+                    <p>{t('products_not_found')}</p>
                 ) : (
                     <>
                         <div className={pageStyles.productGrid}>
@@ -208,8 +210,8 @@ const ProductListPage = () => {
                                             </div>
                                             <div className={cardStyles.info}>
                                                 <h3>{product.name}</h3>
-                                                <p>Цена: {product.price} лв.</p>
-                                                <p>В наличии: {product.stock} шт.</p>
+                                                <p>{t('price')}: {product.price} {t('lv')}</p>
+                                                <p>{t('in_stock')}: {product.stock} {t('pcs')}</p>
                                             </div>
                                         </Link>
                                         <button onClick={() => toggleFavorite(product.id)} className={cardStyles.favoriteButton} style={{ color: isFavorite ? 'red' : 'grey' }}>
@@ -222,11 +224,11 @@ const ProductListPage = () => {
                         {totalPages > 1 && (
                             <div className={pageStyles.pagination}>
                                 <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                    Назад
+                                    {t('previous')}
                                 </button>
-                                <span>Страница {currentPage} из {totalPages}</span>
+                                <span>{t('page')} {currentPage} {t('of')} {totalPages}</span>
                                 <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                                    Вперед
+                                    {t('next')}
                                 </button>
                             </div>
                         )}

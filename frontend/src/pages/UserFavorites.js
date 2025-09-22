@@ -3,12 +3,14 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FavoriteContext } from '../context/FavoriteContext';
 import styles from '../styles/ProductCard.module.css'; // Импортируем стили
+import { useTranslation } from 'react-i18next';
 
 const UserFavorites = () => {
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { toggleFavorite } = useContext(FavoriteContext);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchFavoriteProducts = async () => {
@@ -19,22 +21,22 @@ const UserFavorites = () => {
                 });
                 setFavorites(response.data);
             } catch (err) {
-                setError('Не удалось загрузить избранные товары.');
+                setError(t('favorites_load_error'));
             } finally {
                 setLoading(false);
             }
         };
         fetchFavoriteProducts();
-    }, []);
+    }, [t]);
 
-    if (loading) return <div>Загрузка...</div>;
+    if (loading) return <div>{t('loading_favorites')}</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
         <div>
-            <h3>Избранные товары</h3>
+            <h3>{t('my_favorites')}</h3>
             {favorites.length === 0 ? (
-                <p>У вас нет избранных товаров.</p>
+                <p>{t('no_favorites_yet')}</p>
             ) : (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
                     {favorites.map(product => {
@@ -46,7 +48,7 @@ const UserFavorites = () => {
                                     </div>
                                     <div className={styles.info}>
                                         <h3>{product.name}</h3>
-                                        <p>Цена: {product.price} лв.</p>
+                                        <p>{t('price')}: {product.price} {t('lv')}</p>
                                     </div>
                                 </Link>
                                 <button onClick={() => toggleFavorite(product.id)} className={styles.favoriteButton} style={{ color: 'red' }}><i className="fas fa-heart"></i></button>

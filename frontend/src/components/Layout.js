@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,6 +32,7 @@ const Layout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { clearCart } = useContext(CartContext);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -76,8 +78,8 @@ const Layout = () => {
             <Route path="products/new" element={<AdminProductFormPage />} />
             <Route path="products/:id" element={<AdminProductFormPage />} />
             <Route path="categories" element={<AdminCategories />} />
-            <Route path="manufacturers" element={<AdminGenericCrud apiPath="/manufacturers" title="Производители" placeholder="Название производителя" />} />
-            <Route path="materials" element={<AdminGenericCrud apiPath="/materials" title="Материалы" placeholder="Название материала" />} />
+            <Route path="manufacturers" element={<AdminGenericCrud apiPath="/manufacturers" title={t('manufacturers')} placeholder={t('name')} />} />
+            <Route path="materials" element={<AdminGenericCrud apiPath="/materials" title={t('materials')} placeholder={t('name')} />} />
             <Route path="orders" element={<AdminOrders />} />
           </Route>
           <Route

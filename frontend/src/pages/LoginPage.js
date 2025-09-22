@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { useTranslation } from 'react-i18next';
 
 import styles from '../styles/AuthForm.module.css'; // Используем общий модуль
 
@@ -11,6 +12,7 @@ const LoginPage = ({ onLogin }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -33,21 +35,21 @@ const LoginPage = ({ onLogin }) => {
                 navigate('/'); // Клиентов перенаправляем на главную
             }
         } catch (err) {
-            setError('Неверное имя пользователя или пароль.');
+            setError(t('invalid_credentials_error'));
             console.error(err);
         }
     };
 
     return (
         <div className={styles.formContainer}> {/* Используем класс из общего модуля */}
-            <h2>Вход</h2>
+            <h2>{t('login')}</h2>
             <form onSubmit={handleLogin}>
                 <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
-                    <label>Имя пользователя:</label>
+                    <label>{t('username_label')}</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                 <div className={styles.formGroup}> {/* Используем класс из общего модуля */}
-                    <label>Пароль:</label>
+                    <label>{t('password_label')}</label>
                     <div className={styles.passwordInputContainer}>
                         <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required />
                         <i 
@@ -57,9 +59,9 @@ const LoginPage = ({ onLogin }) => {
                     </div>
                 </div>
                 {error && <p className={styles.errorMessage}>{error}</p>} {/* Используем класс из общего модуля */}
-                <button type="submit" className={styles.formButton}>Войти</button> {/* Используем класс из общего модуля */}
+                <button type="submit" className={styles.formButton}>{t('login')}</button> {/* Используем класс из общего модуля */}
             </form>
-            <p className={styles.formLink}>Нет аккаунта? <Link to="/register">Зарегистрируйтесь</Link></p> {/* Используем класс из общего модуля */}
+            <p className={styles.formLink}>{t('no_account_prompt')} <Link to="/register">{t('register_link')}</Link></p> {/* Используем класс из общего модуля */}
         </div>
     );
 };

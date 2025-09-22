@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/apiClient';
 import { toast } from 'react-toastify';
 import Modal from '../components/Modal';
 import styles from '../styles/AdminPage.module.css';
+import { useTranslation } from 'react-i18next';
 
 const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
     const [items, setItems] = useState([]);
@@ -13,22 +14,23 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
     const [editingItemName, setEditingItemName] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+    const { t } = useTranslation();
 
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
         try {
             setLoading(true);
             const response = await apiClient.get(apiPath);
             setItems(response.data);
         } catch (err) {
-            setError(`Не удалось загрузить ${title}.`);
+            setError(t('loading_data_error'));
         } finally {
             setLoading(false);
         }
-    };
+    }, [apiPath, t]);
 
     useEffect(() => {
         fetchItems();
-    }, [apiPath]);
+    }, [fetchItems]);
 
     const handleCreate = async (e) => {
         e.preventDefault();
@@ -38,7 +40,7 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
             setNewItemName('');
             await fetchItems();
         } catch (err) {
-            toast.error(`Ошибка при создании: ${err.response?.data?.message || err.message}`);
+            toast.error(t('create_error', { message: err.response?.data?.message || err.message }));
         }
     };
 
@@ -58,7 +60,7 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
             handleCancelEdit();
             await fetchItems();
         } catch (err) {
-            toast.error(`Ошибка при обновлении: ${err.response?.data?.message || err.message}`);
+            toast.error(t('update_error', { message: err.response?.data?.message || err.message }));
         }
     };
 
@@ -77,32 +79,32 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
         try {
             await apiClient.delete(`${apiPath}/${itemToDelete.id}`);
             await fetchItems();
-            toast.success('Элемент успешно удален.');
+            toast.success(t('delete_success'));
         } catch (err) {
-            toast.error(`Ошибка при удалении: ${err.response?.data?.message || err.message}`);
+            toast.error(t('delete_error', { message: err.response?.data?.message || err.message }));
         } finally {
             closeDeleteModal();
         }
     };
 
 
-    if (loading) return <div>Загрузка...</div>;
+    if (loading) return <div>{t('loading')}</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
         <div>
             <form onSubmit={handleCreate} className={styles.form}>
-                <h3>Добавить новый элемент</h3>
+                <h3>{t('add_new_item')}</h3>
                 <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} placeholder={placeholder} required />
-                <button type="submit" className={styles.submitButton}>Создать</button>
+                <button type="submit" className={styles.submitButton}>{t('create')}</button>
             </form>
 
             <h2 style={{ marginTop: '2rem' }}>{title}</h2>
             <table className={styles.table}>
                 <thead>
                     <tr>
-                        <th>Название</th>
-                        <th style={{ width: '200px' }}>Действия</th>
+                        <th>{t('name')}</th>
+                        <th style={{ width: '200px' }}>{t('actions')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,11 +119,11 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
                             </td>
                             <td className={styles.actions}>
                                 {editingItemId === item.id ? (
-                                    <><button onClick={() => handleUpdate(item.id)}>Сохранить</button><button onClick={handleCancelEdit}>Отмена</button></>
+                                    <><button onClick={() => handleUpdate(item.id)}>{t('save')}</button><button onClick={handleCancelEdit}>{t('cancel')}</button></>
                                 ) : (
                                     <>
-                                        <button onClick={() => handleEditClick(item)} title="Редактировать"><i className="fas fa-pencil-alt"></i></button>
-                                        <button onClick={() => openDeleteModal(item)} className={styles.deleteButton} title="Удалить"><i className="fas fa-trash-alt"></i></button>
+                                        <button onClick={() => handleEditClick(item)} title={t('edit')}><i className="fas fa-pencil-alt"></i></button>
+                                        <button onClick={() => openDeleteModal(item)} className={styles.deleteButton} title={t('delete')}><i className="fas fa-trash-alt"></i></button>
                                     </>
                                 )}
                             </td>
@@ -133,9 +135,9 @@ const AdminGenericCrud = ({ apiPath, title, placeholder }) => {
                 isOpen={isModalOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                title="Подтвердите удаление"
+                title={t('confirm_delete')}
             >
-                <p>Вы уверены, что хотите удалить элемент <strong>"{itemToDelete?.name}"</strong>?</p>
+                <p>{t('confirm_delete_item', { name: itemToDelete?.name })}</p>
             </Modal>
         </div>
     );

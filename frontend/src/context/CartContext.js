@@ -1,20 +1,24 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export const CartContext = createContext();
 
 // Компонент для кастомного уведомления
-const ToastWithLink = ({ product }) => (
-    <div>
-        <p style={{ margin: 0, padding: 0 }}>"{product.name}" добавлен в корзину!</p>
-        <Link to="/cart" style={{ color: '#a7d7ff', fontWeight: 'bold', textDecoration: 'underline' }}>
-            Перейти в корзину
-        </Link>
-    </div>
-);
+const ToastWithLink = ({ product, t }) => {
+    return (
+        <div>
+            <p style={{ margin: 0, padding: 0 }}>{t('product_added_to_cart', { name: product.name })}</p>
+            <Link to="/cart" style={{ color: '#a7d7ff', fontWeight: 'bold', textDecoration: 'underline' }}>
+                {t('go_to_cart')}
+            </Link>
+        </div>
+    );
+};
 
 export const CartProvider = ({ children }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const handleToastClick = () => navigate('/cart');
 
@@ -44,7 +48,7 @@ export const CartProvider = ({ children }) => {
             // Добавляем новый товар
             return [...prevItems, { ...product, quantity: Math.min(product.stock, quantityToAdd) }];
         });
-        toast.success(<ToastWithLink product={product} />, {
+        toast.success(<ToastWithLink product={product} t={t} />, {
             onClick: handleToastClick,
         });
     };
@@ -53,7 +57,7 @@ export const CartProvider = ({ children }) => {
         setCartItems(prevItems => {
             const itemToRemove = prevItems.find(item => item.id === productId);
             if (itemToRemove) {
-                toast.info(`"${itemToRemove.name}" удален из корзины.`);
+                toast.info(t('product_removed_from_cart', { name: itemToRemove.name }));
             }
             return prevItems.filter(item => item.id !== productId);
         });

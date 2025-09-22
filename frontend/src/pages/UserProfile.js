@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../api/apiClient';
 import { toast } from 'react-toastify';
 import styles from '../styles/AuthForm.module.css';
+import { useTranslation } from 'react-i18next';
 
 const UserProfile = () => {
     const [profile, setProfile] = useState({ firstName: '', lastName: '', email: '', phone: '', address: '', preferredDeliveryMethod: '', preferredDeliveryType: '' });
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [initialProfile, setInitialProfile] = useState(null); // Для отмены изменений
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');    
+    const { t } = useTranslation();
 
     useEffect(() => {
         let isMounted = true;
@@ -31,14 +32,14 @@ const UserProfile = () => {
                     setInitialProfile(profileData); // Сохраняем исходные данные
                 }
             } catch (err) {
-                if (isMounted) setError('Не удалось загрузить данные профиля.');
+                if (isMounted) setError(t('profile_load_error'));
             } finally {
                 if (isMounted) setLoading(false);
             }
         };
         fetchProfile();
         return () => { isMounted = false; };
-    }, []);
+    }, [t]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -53,32 +54,29 @@ const UserProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
         try {
-            const response = await apiClient.put('/auth/profile', profile);
-            setSuccess(response.data.message);
-            toast.success(response.data.message);
+            await apiClient.put('/auth/profile', profile);
+            toast.success(t('profile_update_success'));
             setInitialProfile(profile); // Обновляем исходные данные после сохранения
             setIsEditing(false); // Выходим из режима редактирования
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Ошибка при обновлении профиля.';
+            const errorMessage = err.response?.data?.message || t('profile_update_error');
             setError(errorMessage);
             toast.error(errorMessage);
         }
     };
 
-    if (loading) return <div>Загрузка...</div>;
+    if (loading) return <div>{t('loading')}</div>;
     if (error) return <p className={styles.errorMessage}>{error}</p>;
 
     return (
         <div className={styles.formContainer} style={{ backgroundColor: 'white' }}>
             <div className={styles.profileHeader}>
-                <h3>Личные данные</h3>
+                <h3>{t('personal_data')}</h3>
                 {!isEditing && (
                     <button onClick={() => setIsEditing(true)} className={styles.editButton}>
                         <i className="fas fa-pencil-alt" style={{ marginRight: '8px' }}></i>
-                        Редактировать
+                        {t('edit')}
                     </button>
                 )}
             </div>
@@ -88,17 +86,17 @@ const UserProfile = () => {
                     {error && <p className={styles.errorMessage}>{error}</p>}
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
-                            <label>Имя</label><input type="text" name="firstName" value={profile.firstName} onChange={handleChange} />
+                            <label>{t('first_name')}</label><input type="text" name="firstName" value={profile.firstName} onChange={handleChange} />
                         </div>
                         <div className={styles.formGroup}>
-                            <label>Фамилия</label><input type="text" name="lastName" value={profile.lastName} onChange={handleChange} />
+                            <label>{t('last_name')}</label><input type="text" name="lastName" value={profile.lastName} onChange={handleChange} />
                         </div>
                     </div>
                     <div className={styles.formGroup}><label>Email</label><input type="email" name="email" value={profile.email} onChange={handleChange} /></div>
-                    <div className={styles.formGroup}><label>Телефон</label><input type="tel" name="phone" value={profile.phone} onChange={handleChange} /></div>
-                    <div className={styles.formGroup}><label>Адрес</label><textarea name="address" value={profile.address} onChange={handleChange} rows="3"></textarea></div>
+                    <div className={styles.formGroup}><label>{t('phone')}</label><input type="tel" name="phone" value={profile.phone} onChange={handleChange} /></div>
+                    <div className={styles.formGroup}><label>{t('address')}</label><textarea name="address" value={profile.address} onChange={handleChange} rows="3"></textarea></div>
                     <div className={styles.formGroup}>
-                        <label>Предпочтительный способ доставки</label>
+                        <label>{t('preferred_delivery_method')}</label>
                         <div className={styles.radioGroup} style={{ justifyContent: 'flex-start' }}>
                             <div className={styles.toggleSwitch}>
                                 <div className={`${styles.toggleOption} ${profile.preferredDeliveryMethod === 'econt' ? styles.active : ''}`} onClick={() => setProfile({ ...profile, preferredDeliveryMethod: 'econt' })}>
@@ -111,32 +109,32 @@ const UserProfile = () => {
                             </div>
                             <div className={styles.toggleSwitch}>
                                 <div className={`${styles.toggleOption} ${profile.preferredDeliveryType === 'office' ? styles.active : ''}`} onClick={() => setProfile({ ...profile, preferredDeliveryType: 'office' })}>
-                                    До офиса
+                                    {t('to_office')}
                                 </div>
                                 <div className={`${styles.toggleOption} ${profile.preferredDeliveryType === 'address' ? styles.active : ''}`} onClick={() => setProfile({ ...profile, preferredDeliveryType: 'address' })}>
-                                    До адреса
+                                    {t('to_address')}
                                 </div>
                                 {profile.preferredDeliveryType && <div className={styles.toggleSlider} style={{ transform: profile.preferredDeliveryType === 'address' ? 'translateX(100%)' : 'translateX(0)' }}></div>}
                             </div>
                         </div>
                     </div>
                     <div className={styles.formActions}>
-                        <button type="submit" className={styles.formButton}>Сохранить изменения</button>
-                        <button type="button" onClick={handleCancelEdit} className={styles.cancelButton}>Отмена</button>
+                        <button type="submit" className={styles.formButton}>{t('save_changes')}</button>
+                        <button type="button" onClick={handleCancelEdit} className={styles.cancelButton}>{t('cancel')}</button>
                     </div>
                 </form>
             ) : (
                 <div className={styles.profileView}>
                     <div className={styles.profileField}>
-                        <strong>Имя и фамилия:</strong>
-                        <p>{`${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Не указано'}</p>
+                        <strong>{t('full_name')}:</strong>
+                        <p>{`${profile.firstName || ''} ${profile.lastName || ''}`.trim() || t('not_specified')}</p>
                     </div>
                     <div className={styles.profileField}><strong>Email:</strong><p>{profile.email || 'Не указано'}</p></div>
-                    <div className={styles.profileField}><strong>Телефон:</strong><p>{profile.phone || 'Не указано'}</p></div>
-                    <div className={styles.profileField}><strong>Адрес:</strong><p>{profile.address || 'Не указан'}</p></div>
+                    <div className={styles.profileField}><strong>{t('phone')}:</strong><p>{profile.phone || t('not_specified')}</p></div>
+                    <div className={styles.profileField}><strong>{t('address')}:</strong><p>{profile.address || t('not_specified')}</p></div>
                     <div className={styles.profileField}>
-                        <strong>Доставка:</strong>
-                        <p>{profile.preferredDeliveryMethod && profile.preferredDeliveryType ? `${profile.preferredDeliveryMethod}, ${profile.preferredDeliveryType === 'office' ? 'до офиса' : 'до адреса'}` : 'Не указано'}</p>
+                        <strong>{t('delivery')}:</strong>
+                        <p>{profile.preferredDeliveryMethod && profile.preferredDeliveryType ? `${profile.preferredDeliveryMethod}, ${profile.preferredDeliveryType === 'office' ? t('to_office') : t('to_address')}` : t('not_specified')}</p>
                     </div>
                 </div>
             )}

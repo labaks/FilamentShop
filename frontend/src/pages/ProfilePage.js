@@ -1,24 +1,26 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import styles from '../styles/ProfilePage.module.css'; // Подключаем новые стили
+import { useTranslation } from 'react-i18next';
 
 const ProfilePage = () => {
+    const { t } = useTranslation();
     return (
         <div className={styles.profileContainer}>
             <aside className={styles.sidebar}>
-                <h2>Личный кабинет</h2>
+                <h2>{t('user_account')}</h2>
                 <nav className={styles.nav}>
                     <NavLink to="/profile/me" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
-                        Мой профиль
+                        {t('my_profile')}
                     </NavLink>
                     <NavLink to="/profile/orders" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
-                        Мои заказы
+                        {t('my_orders')}
                     </NavLink>
                     <NavLink to="/profile/favorites" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
-                        Избранное
+                        {t('my_favorites')}
                     </NavLink>
                     <NavLink to="/profile/security" className={({ isActive }) => isActive ? styles.activeLink : styles.link}>
-                        Безопасность
+                        {t('security')}
                     </NavLink>
                 </nav>
             </aside>
